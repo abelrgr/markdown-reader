@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Markdown Reader</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body style="width: 100vw; height: 100vh">
+    <div class="flex flex-col w-full h-full">
+      <div class="bg-white w-full border-b-2 flex-nowrap toolbar">
+        <div class="flex gap-2">
+          <div class="dropdown">
+            <button class="dropbtn file">File</button>
+            <div class="dropdown-content">
+              <a onclick="openFile();">Open File</a>
+              <a class="separator"></a>
+              <a onclick="onWindowClose();">Exit</a>
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="dropbtn file">Recent Files</a>
+            <div class="dropdown-content" id="recentFilesList"></div>
+          </div>
+        </div>
+
+        <button class="dropbtn about rounded-lg" onclick="openAboutModal()">
+          About
+        </button>
+      </div>
+      <div class="flex-grow w-full overflow-auto dropzone" id="dropZone">
+        <div class="message">DROP YOUR FILE HERE</div>
+
+        <div id="myModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>About</h2>
+            <p>This is a simple markdown reader app built with NeutralinoJs.</p>
+            <p>You can open markdown files and read them.</p>
+            <p>You can also open recent files from the recent files list.</p>
+            <p class="flex gap-2">
+              <span class="font-semibold">Contact:</span>
+              <span>abelgalloruiz@gmail.com</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/neutralino.js"></script>
+    <script src="/js/marked.min.js"></script>
+
+    <script src="/js/main.js"></script>
+  </body>
+</html>

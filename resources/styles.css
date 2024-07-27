@@ -1,0 +1,201 @@
+/* #region CSS reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* #region General styles */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+.bg-white {
+  background-color: white;
+}
+.border-b-2 {
+  border-bottom-width: 2px;
+}
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+.w-screen {
+  width: 100vw;
+}
+.h-screen {
+  height: 100vh;
+}
+.overflow-auto {
+  overflow: auto;
+}
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+.font-semibold {
+  font-weight: 600;
+}
+
+/* #region toolbar  */
+.toolbar {
+  background-color: #1e1f1c;
+  /* border-bottom: 1px solid #e0e0e0; */
+  padding: 0.1rem 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: Arial, sans-serif;
+  /* justify-content: space-between; */
+}
+.toolbar .dropbtn {
+  padding: 0.2rem;
+  font-size: 0.7rem;
+  border: none;
+  cursor: pointer;
+}
+.toolbar .dropbtn.file {
+  background-color: #1e1f1c;
+  color: white;
+}
+.toolbar .dropbtn.file:hover {
+  background-color: #7b8395;
+}
+.toolbar .dropbtn.about {
+  background-color: #1e1f1c;
+  color: white;
+}
+.toolbar .dropdown {
+  position: relative;
+  display: inline-block;
+}
+.toolbar .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #1e1f1c;
+  min-width: 6rem;
+  z-index: 1;
+}
+.toolbar .dropdown-content a {
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem;
+  text-decoration: none;
+  display: block;
+}
+.toolbar .dropdown-content a.separator {
+  border-top: 1px solid white;
+  padding: 0;
+}
+.toolbar .dropdown-content a:hover {
+  background-color: #333430;
+}
+.toolbar .dropdown:hover .dropdown-content {
+  display: block;
+}
+.toolbar .dropzone {
+  position: relative;
+  padding: 1rem;
+}
+.toolbar .dropzone.hover .message {
+  border: 2px dashed #000;
+  background-color: #f9f9f9;
+}
+.toolbar .dropzone .message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+/* #region Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  animation-name: animModal;
+  animation-duration: 0.4s;
+}
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@keyframes animModal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
