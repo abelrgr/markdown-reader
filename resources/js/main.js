@@ -1,3 +1,4 @@
+// #region Variables
 var validExtensions = [
   "md",
   "mkd",
@@ -6,11 +7,13 @@ var validExtensions = [
   "mdtxt",
   "mdtext",
   "markdown",
-  "text"
+  "text",
 ];
 
 var recentFiles = [];
 var storage = { recentFiles: [] };
+
+// #region APP functions
 
 // Function to get the recent files list from the storage
 async function getStorage() {
@@ -32,6 +35,17 @@ async function getStorage() {
 
   recentFiles.forEach((file, index) => {
     var a = document.createElement("a");
+    // a.classList.add("block px-4 py-2 text-sm text-gray-700 hover:bg-blue hover:text-white");
+    a.classList.add(
+      "block",
+      "px-4",
+      "py-2",
+      "text-sm",
+      "text-gray-700",
+      "truncate",
+      "hover:bg-blue",
+      "hover:text-white"
+    );
     a.innerHTML = file;
     a.href = "#";
     a.onclick = () => openRecentFile(file);
@@ -42,7 +56,7 @@ async function getStorage() {
 // Function to update the recent files list in the storage
 async function setStorage(item) {
   if (recentFiles.includes(item)) {
-    recentFiles = recentFiles.filter(file => file !== item);
+    recentFiles = recentFiles.filter((file) => file !== item);
   }
 
   recentFiles.unshift(item);
@@ -233,16 +247,56 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// #region UI functions
 
+async function setFooterInfo() {
+  const cpuInfo = await Neutralino.computer.getCPUInfo();
+  const osInfo = await Neutralino.computer.getOSInfo();
+  const text = `CPU: ${cpuInfo.model.trim()} | OS: ${osInfo.description.trim()}`;
 
+  const el = document.getElementById("system-info");
 
-// #region Modal
-var modal = document.getElementById("myModal");
+  setTimeout(() => {
+    el.innerHTML = text;
+  }, 2000);
+}
 
-function openAboutModal() {
-  modal.style.display = "block";
+function toggleMenu(menuId) {
+  var menu = document.getElementById(menuId);
+  var menus = document.querySelectorAll('[id$="-menu"]');
+  menus.forEach(function (m) {
+    if (m.id !== menuId) {
+      m.classList.add("hidden");
+    }
+  });
+  menu.classList.toggle("hidden");
+}
+
+function openModal() {
+  var modal = document.getElementById("aboutModal");
+  modal.classList.remove("hidden");
+  document.getElementById("lastUpdated").textContent = "10/01/2024";
 }
 
 function closeModal() {
-  modal.style.display = "none";
+  var modal = document.getElementById("aboutModal");
+  modal.classList.add("hidden");
 }
+
+window.onclick = function (event) {
+  var modal = document.getElementById("aboutModal");
+  if (event.target == modal) {
+    closeModal();
+  }
+};
+
+document.addEventListener("click", function (event) {
+  if (!event.target.matches("button")) {
+    var menus = document.querySelectorAll('[id$="-menu"]');
+    menus.forEach(function (menu) {
+      menu.classList.add("hidden");
+    });
+  }
+});
+
+setFooterInfo();

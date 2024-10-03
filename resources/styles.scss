@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dropzone {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+}
+.dropzone.hover .message {
+  border: 2px dashed #000;
+  background-color: #f9f9f9;
+}
+.dropzone .message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+.dropzone h1,
+.dropzone h2,
+.dropzone h3,
+.dropzone h4,
+.dropzone h5,
+.dropzone h6 {
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 1.5em 0 0.75em;
+}
+
+.dropzone h1 {
+  font-size: 2em;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.3em;
+}
+
+.dropzone h2 {
+  font-size: 1.75em;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.3em;
+}
+
+.dropzone h3 {
+  font-size: 1.5em;
+}
+
+.dropzone h4 {
+  font-size: 1.25em;
+}
+
+.dropzone h5 {
+  font-size: 1em;
+}
+
+.dropzone h6 {
+  font-size: 0.85em;
+  color: #666;
+}
+
+.dropzone p {
+  margin: 1em 0;
+}
+
+.dropzone a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.dropzone a:hover {
+  text-decoration: underline;
+}
+
+.dropzone ul,
+.dropzone ol {
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.dropzone li {
+  margin-bottom: 0.5em;
+}
+
+.dropzone blockquote {
+  margin: 1.5em 0;
+  padding-left: 1.5em;
+  border-left: 4px solid #ccc;
+  color: #555;
+  font-style: italic;
+}
+
+.dropzone code {
+  font-family: "Courier New", Courier, monospace;
+  background-color: #f4f4f4;
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+  border-radius: 3px;
+}
+
+.dropzone pre {
+  background-color: #f4f4f4;
+  padding: 1em;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.dropzone pre code {
+  font-size: 0.9em;
+}
+
+.dropzone table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1.5em;
+}
+
+.dropzone table th,
+.dropzone table td {
+  padding: 0.75em;
+  border: 1px solid #ccc;
+}
+
+.dropzone table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.dropzone img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em 0;
+}
+
+.dropzone strong {
+  font-weight: bold;
+}
+
+.dropzone em {
+  font-style: italic;
+}
+
+.dropzone hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 2em 0;
+}
+
+.loader {
+  width: 40px;
+  margin: 5px 0;
+  aspect-ratio: 4;
+  background: radial-gradient(circle closest-side, #000 90%, #0000) 0 /
+    calc(100% / 3) 100% space;
+  clip-path: inset(0 100% 0 0);
+  animation: l1 1s steps(4) infinite;
+}
+@keyframes l1 {
+  to {
+    clip-path: inset(0 -34% 0 0);
+  }
+}

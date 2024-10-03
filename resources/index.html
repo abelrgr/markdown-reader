@@ -1,48 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="UTF-8" />
     <title>Markdown Reader</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body style="width: 100vw; height: 100vh">
-    <div class="flex flex-col w-full h-full">
-      <div class="bg-white w-full border-b-2 flex-nowrap toolbar">
-        <div class="flex gap-2">
-          <div class="dropdown">
-            <button class="dropbtn file">File</button>
-            <div class="dropdown-content">
-              <a onclick="openFile();">Open File</a>
-              <a class="separator"></a>
-              <a onclick="onWindowClose();">Exit</a>
+    <div
+      class="flex flex-col h-screen bg-gradient-to-b from-blue/10 to-blue-dark/40 overflow-hidden"
+    >
+      <header class="bg-gradient-to-b from-blue to-blue-dark shadow-md z-50">
+        <nav class="flex" aria-label="Main Menu">
+          <div class="relative">
+            <button
+              onclick="toggleMenu('file-menu')"
+              class="px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-t-md transition-colors duration-200"
+            >
+              File
+            </button>
+            <div
+              id="file-menu"
+              class="hidden absolute left-0 w-48 bg-white rounded-md shadow-lg border border-gray-200"
+            >
+              <a
+                href="#"
+                onclick="openFile();"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue hover:text-white truncate"
+              >
+                Open
+              </a>
+              <div class="h-px bg-gray-200 my-1 mx-2"></div>
+              <div id="recentFilesList" class="flex flex-col"></div>
+
+              <div class="h-px bg-gray-200 my-1 mx-2"></div>
+              <a
+                href="#"
+                onclick="onWindowClose();"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue hover:text-white"
+                >Exit</a
+              >
             </div>
           </div>
-          <div class="dropdown">
-            <a class="dropbtn file">Recent Files</a>
-            <div class="dropdown-content" id="recentFilesList"></div>
+          <div class="relative">
+            <button
+              onclick="toggleMenu('help-menu')"
+              class="px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-t-md transition-colors duration-200"
+            >
+              Help
+            </button>
+            <div
+              id="help-menu"
+              class="hidden absolute left-0 w-48 bg-white rounded-md shadow-lg border border-gray-200"
+            >
+              <a
+                href="#"
+                onclick="openModal()"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue hover:text-white"
+                >About</a
+              >
+            </div>
           </div>
-        </div>
+        </nav>
+      </header>
 
-        <button class="dropbtn about rounded-lg" onclick="openAboutModal()">
-          About
-        </button>
-      </div>
-      <div class="flex-grow w-full overflow-auto dropzone" id="dropZone">
+      <main
+        class="flex-grow m-2 p-5 bg-white border border-gray-300 rounded-md shadow-md overflow-y-auto dropzone"
+        id="dropZone"
+      >
         <div class="message">DROP YOUR FILE HERE</div>
+      </main>
 
-        <div id="myModal" class="modal">
-          <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>About</h2>
-            <p>This is a simple markdown reader app built with NeutralinoJs.</p>
-            <p>You can open markdown files and read them.</p>
-            <p>You can also open recent files from the recent files list.</p>
-            <p class="flex gap-2">
-              <span class="font-semibold">Contact:</span>
-              <span>abelgalloruiz@gmail.com</span>
-            </p>
-          </div>
+      <footer
+        class="bg-gradient-to-b from-gray-200 to-gray-300 p-2 border-t border-gray-300 text-sm text-gray-600"
+      >
+        <span id="system-info"><div class="loader"></div></span>
+      </footer>
+    </div>
+
+    <div
+      id="aboutModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    >
+      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">About This Application</h2>
+          <button
+            onclick="closeModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            &times;
+          </button>
         </div>
+        <p class="mb-4">
+          This is a simple markdown reader app built with NeutralinoJs.
+        </p>
+        <p class="text-sm text-gray-600">
+          Version: 1.0.0<br />
+          Created by:
+          <a
+            href="mailto:abelgalloruiz@gmail.com"
+            class="font-semibold text-blue"
+            >Abel Gallo Ruiz</a
+          ><br />
+          Last Updated: <span id="lastUpdated"></span>
+        </p>
+        <button
+          onclick="closeModal()"
+          class="mt-4 px-4 py-2 bg-blue text-white rounded hover:bg-blue-dark transition-colors duration-200"
+        >
+          Close
+        </button>
       </div>
     </div>
 
