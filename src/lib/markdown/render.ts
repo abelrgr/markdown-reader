@@ -1,40 +1,70 @@
-import type { Root as MdastRoot } from 'mdast';
-import { toString } from 'mdast-util-to-string';
-import { VFile } from 'vfile';
-import { visit } from 'unist-util-visit';
-import { getHighlighter, SHIKI_LANGS } from './highlighter';
-import { createProcessor } from './pipeline';
-import { computeStats } from './stats';
-import type { RenderResult, TocItem } from './types';
+import type { RenderResult } from './types';
 
-const LANGUAGE_ALIASES: Readonly<Record<string, string>> = {
-  js: 'javascript',
-  ts: 'typescript',
-  sh: 'shellscript',
-  yml: 'yaml',
-  py: 'python',
-};
-
-export async function renderMarkdownCore(source: string): Promise<RenderResult> {
-  const processor = createProcessor(await getHighlighter());
-  const mdast = processor.parse(source) as MdastRoot;
-  const highlighter = await getHighlighter();
-  const loaded = new Set(highlighter.getLoadedLanguages());
-  visit(mdast, 'code', (node) => {
-    if (!node.lang) return;
-    const language = LANGUAGE_ALIASES[node.lang.toLowerCase()] ?? node.lang.toLowerCase();
-    node.lang = loaded.has(language) ? language : 'text';
-  });
-  const file = new VFile({ value: source });
-  const tree = await processor.run(mdast, file);
-  const html = processor.stringify(tree);
-  const data = file.data as { frontmatter?: Record<string, unknown> | null; toc?: TocItem[] };
-  return {
-    html,
-    toc: data.toc ?? [],
-    frontmatter: data.frontmatter ?? null,
-    stats: computeStats(toString(mdast)),
-  };
+interface RenderRequest {
+  id: number;
+  source: string;
 }
 
-export const renderMarkdown = renderMarkdownCore;
+interface RenderResponse {
+  id: number;
+  result?: RenderResult;
+  error?: string;
+}
+
+interface PendingRender {
+  resolve: (result: RenderResult) => void;
+  reject: (error: Error) => void;
+}
+
+let worker: Worker | null = null;
+let nextId = 0;
+const pending = new Map<number, PendingRender>();
+
+function failPending(message: string): void {
+  const activeWorker = worker;
+  worker = null;
+  activeWorker?.terminate();
+  for (const request of pending.values()) request.reject(new Error(message));
+  pending.clear();
+}
+
+function getWorker(): Worker {
+  if (worker) return worker;
+  worker = new Worker(new URL('./render.worker.ts', import.meta.url), { type: 'module' });
+  worker.addEventListener('message', (event: MessageEvent<RenderResponse>) => {
+    const request = pending.get(event.data.id);
+    if (!request) return;
+    pending.delete(event.data.id);
+    if (event.data.error !== undefined) request.reject(new Error(event.data.error));
+    else if (event.data.result) request.resolve(event.data.result);
+    else request.reject(new Error('Markdown renderer returned an empty response'));
+  });
+  worker.addEventListener('error', (event) => {
+    event.preventDefault();
+    const location = event.filename ? ` at ${event.filename}:${event.lineno}:${event.colno}` : '';
+    failPending(`${event.message || 'Markdown renderer worker failed'}${location}`);
+  });
+  worker.addEventListener('messageerror', () => {
+    failPending('Could not read the Markdown renderer response');
+  });
+  return worker;
+}
+
+export async function renderMarkdown(source: string): Promise<RenderResult> {
+  if (typeof Worker === 'undefined') {
+    const { renderMarkdownCore } = await import('./render-core');
+    return renderMarkdownCore(source);
+  }
+
+  const currentWorker = getWorker();
+  const id = ++nextId;
+  return new Promise<RenderResult>((resolve, reject) => {
+    pending.set(id, { resolve, reject });
+    try {
+      currentWorker.postMessage({ id, source } satisfies RenderRequest);
+    } catch (error: unknown) {
+      pending.delete(id);
+      reject(error instanceof Error ? error : new Error(String(error)));
+    }
+  });
+}

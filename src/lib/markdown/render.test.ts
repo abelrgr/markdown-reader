@@ -1,7 +1,17 @@
-import { describe, expect, test } from 'vitest';
-import { renderMarkdownCore } from './render';
+import { describe, expect, test, vi } from 'vitest';
+import { renderMarkdown } from './render';
+import { renderMarkdownCore } from './render-core';
 
 describe('renderMarkdownCore', () => {
+  test('falls back to the core renderer when Web Workers are unavailable', async () => {
+    vi.stubGlobal('Worker', undefined);
+    try {
+      expect((await renderMarkdown('# fallback')).html).toContain('<h1');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   test('GFM table', async () => {
     const r = await renderMarkdownCore('| a | b |\n|---|---|\n| 1 | 2 |');
     expect(r.html).toContain('<table>');

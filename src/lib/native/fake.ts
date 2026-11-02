@@ -24,12 +24,14 @@ for (const [source, content] of Object.entries(fixtureFiles)) {
 
 type E2eApi = {
   setDialogResult: (paths: string[]) => void;
+  hasFile: (path: string) => boolean;
   drop: (paths: string[]) => void;
   dragOver: (inside: boolean) => void;
   emitOpenPaths: (paths: string[]) => void;
   writeFile: (path: string, content: string) => void;
   deleteFile: (path: string) => void;
   openedUrls: string[];
+  openPathsReady: boolean;
   zoom?: number;
   fullscreen?: boolean;
   menu?: MenuModel;
@@ -59,6 +61,9 @@ function trigger(path: string, change: FileChange): void {
 }
 
 const e2e: E2eApi = {
+  hasFile(path) {
+    return files.has(normalized(path));
+  },
   setDialogResult(paths) {
     dialogResult = [...paths];
   },
@@ -82,6 +87,7 @@ const e2e: E2eApi = {
     trigger(key, 'removed');
   },
   openedUrls: [],
+  openPathsReady: false,
 };
 if (typeof window !== 'undefined') window.__e2e = e2e;
 
@@ -100,7 +106,7 @@ export const fakeNative: NativeApi = {
     };
   },
   async pathsExist(paths) {
-    return paths.map((path) => files.has(normalized(path)));
+    return paths.map((path) => e2e.hasFile(path));
   },
   async takeStartupPaths() {
     if (typeof window === 'undefined') return [];
@@ -110,6 +116,7 @@ export const fakeNative: NativeApi = {
   },
   async onOpenPaths(cb) {
     openPathListeners.add(cb);
+    e2e.openPathsReady = true;
     return () => openPathListeners.delete(cb);
   },
   async pickMarkdownFiles() {

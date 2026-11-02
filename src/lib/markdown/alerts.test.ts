@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { renderMarkdownCore } from './render';
+import { renderMarkdownCore } from './render-core';
 
 describe('GitHub alerts', () => {
   test.each(['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'])('alert %s', async (kind) => {

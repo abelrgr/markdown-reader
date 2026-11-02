@@ -9,6 +9,7 @@ src-tauri/binaries/
 # Playwright
 test-results/
 playwright-report/
+tests/e2e/generated/big.md
 # Neutralino (legacy)
 legacy/bin/
 legacy/dist/

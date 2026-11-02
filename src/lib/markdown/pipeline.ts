@@ -5,43 +5,44 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
-import rehypeSlug from 'rehype-slug';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeStringify from 'rehype-stringify';
 import rehypeShikiFromHighlighter from '@shikijs/rehype/core';
 import type { HighlighterCore } from 'shiki';
 import { remarkFrontmatterData } from './plugins/frontmatter';
 import { rehypeAlerts } from './plugins/alerts';
-import { rehypeCollectToc } from './plugins/toc';
+import { rehypeHeadings } from './plugins/toc';
 import { rehypeMarkLocalImages } from './plugins/local-images';
 import { rehypeFixClobberedFragments } from './plugins/fix-clobbered-fragments';
+import { rehypeSafeMarkdownUrls } from './plugins/safe-urls';
 
-export function createProcessor(highlighter: HighlighterCore) {
-  return unified()
+export function createProcessor(
+  highlighter: HighlighterCore | null,
+  parseRawHtml = true,
+  processAlerts = true,
+) {
+  const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkFrontmatter, ['yaml'])
     .use(remarkFrontmatterData)
-    .use(remarkRehype, { allowDangerousHtml: true, clobberPrefix: '' })
-    .use(rehypeRaw)
-    .use(rehypeSanitize, { ...defaultSchema, clobberPrefix: 'user-content-' })
-    .use(rehypeFixClobberedFragments)
-    .use(rehypeAlerts)
-    .use(rehypeSlug)
-    .use(rehypeCollectToc)
-    .use(rehypeAutolinkHeadings, {
-      behavior: 'append',
-      properties: { className: ['heading-anchor'], ariaHidden: 'true', tabIndex: -1 },
-      content: { type: 'text', value: '#' },
-    })
-    .use(() =>
+    .use(remarkRehype, { allowDangerousHtml: true, clobberPrefix: '' });
+  if (parseRawHtml) {
+    processor
+      .use(rehypeRaw)
+      .use(rehypeSanitize, { ...defaultSchema, clobberPrefix: 'user-content-' })
+      .use(rehypeFixClobberedFragments);
+  } else processor.use(rehypeSafeMarkdownUrls);
+  if (processAlerts) processor.use(rehypeAlerts);
+  processor.use(rehypeHeadings);
+  if (highlighter) {
+    processor.use(() =>
       rehypeShikiFromHighlighter(highlighter, {
         themes: { light: 'github-light', dark: 'github-dark' },
         defaultColor: 'light',
         fallbackLanguage: 'text',
         // Unknown languages are normalized to plain text in render.ts before Shiki runs.
       }),
-    )
-    .use(rehypeMarkLocalImages)
-    .use(rehypeStringify);
+    );
+  }
+  return processor.use(rehypeMarkLocalImages).use(rehypeStringify);
 }

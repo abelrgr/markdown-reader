@@ -209,27 +209,51 @@ button {
 }
 .sidebar {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   flex: 0 0 15rem;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   border-right: 1px solid #8884;
   padding: 1rem;
 }
 .sidebar h2 {
+  flex: 0 0 auto;
   margin: 0 0 0.75rem;
   font-size: 1rem;
 }
 .sidebar nav {
-  display: grid;
-  gap: 0.2rem;
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }
 .sidebar nav button {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
   border: 0;
+  margin-bottom: 0.2rem;
   padding: 0.25rem;
   padding-left: calc(var(--depth) * 0.5rem);
   background: none;
   color: inherit;
   text-align: left;
+}
+.toc-virtual-space {
+  position: relative;
+  width: 100%;
+}
+.sidebar nav button.toc-virtual-item {
+  position: absolute;
+  top: calc(var(--row) * 28px);
+  right: 0;
+  left: 0;
+  height: 28px;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .sidebar nav button.active {
   font-weight: 700;
