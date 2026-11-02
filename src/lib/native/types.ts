@@ -34,7 +34,10 @@ export interface NativeApi {
   takeStartupPaths(): Promise<string[]>;
   onOpenPaths(cb: (paths: string[]) => void): Promise<Unlisten>;
   pickMarkdownFiles(): Promise<string[]>;
-  onFileDrop(h: { over: (inside: boolean) => void; drop: (paths: string[]) => void }): Promise<Unlisten>;
+  onFileDrop(h: {
+    over: (inside: boolean) => void;
+    drop: (paths: string[]) => void;
+  }): Promise<Unlisten>;
   watchFile(path: string, onChange: (change: FileChange) => void): Promise<Unlisten>;
   openExternal(url: string): Promise<void>;
   revealInFolder(path: string): Promise<void>;
@@ -44,5 +47,7 @@ export interface NativeApi {
   setFullscreen(on: boolean): Promise<void>;
   appInfo(): Promise<{ version: string; tauriVersion: string }>;
   quit(): Promise<void>;
+  setMenu(model: MenuModel, onAction: (id: string) => void): Promise<void>;
   store: KeyValueStore;
 }
+import type { MenuModel } from '../menu';

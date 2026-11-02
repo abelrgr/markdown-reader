@@ -8,14 +8,26 @@
   import Sidebar from './components/Sidebar.svelte';
   import StatusBar from './components/StatusBar.svelte';
   import MetaCard from './components/MetaCard.svelte';
-  import { applyTheme, disposeApp, initApp, isDropInside, tabs } from './lib/state/app.svelte';
+  import {
+    applyTheme,
+    disposeApp,
+    initApp,
+    isDropInside,
+    openPaths,
+    tabs,
+  } from './lib/state/app.svelte';
   import { settings } from './lib/state/settings.svelte';
   import { native } from './lib/native';
   import { t } from './lib/i18n/index.svelte';
   import { toasts } from './lib/state/toasts.svelte';
   import { bindShortcuts } from './lib/commands';
   import { registerAppCommands } from './lib/app-commands';
-  import { removeRecent } from './lib/state/app.svelte';
+  import { recents } from './lib/state/app.svelte';
+  import SettingsDialog from './components/SettingsDialog.svelte';
+  import AboutDialog from './components/AboutDialog.svelte';
+  import ShortcutsDialog from './components/ShortcutsDialog.svelte';
+  import { buildMenuModel } from './lib/menu';
+  import { runCommand, type CommandId } from './lib/commands';
 
   onMount(() => {
     registerAppCommands();
@@ -36,6 +48,17 @@
     const value = settings.value;
     applyTheme();
     void native.setZoom(value.zoom);
+  });
+  $effect(() => {
+    recents.items;
+    t('menu.file');
+    void native.setMenu(
+      buildMenuModel(recents.items, { isMac: /Mac|iPhone|iPad/.test(navigator.platform) }),
+      (id) => {
+        if (id.startsWith('recent:')) void openPaths([id.slice(7)]);
+        else void runCommand(id as CommandId);
+      },
+    );
   });
   $effect(() => {
     const active = tabs.active;
@@ -64,4 +87,7 @@
   {:else}<EmptyState />{/if}
   <DropOverlay visible={isDropInside()} />
   <Toasts />
+  <SettingsDialog />
+  <AboutDialog />
+  <ShortcutsDialog />
 </div>
