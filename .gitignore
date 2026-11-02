@@ -1,0 +1,22 @@
+# Node / Vite
+node_modules/
+dist/
+*.log
+# Tauri / Rust
+src-tauri/target/
+src-tauri/gen/schemas/
+src-tauri/binaries/
+# Playwright
+test-results/
+playwright-report/
+# Neutralino (legacy)
+legacy/bin/
+legacy/dist/
+legacy/.storage/
+legacy/.tmp/
+legacy/resources/js/neutralino.js
+.tmp/
+# Editors / OS
+.lite_workspace.lua
+.DS_Store
+Thumbs.db
