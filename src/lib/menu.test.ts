@@ -7,6 +7,7 @@ describe('buildMenuModel', () => {
       path: `/docs/${index}.md`,
       pinned: false,
       openedAt: index,
+      kind: 'file' as const,
     }));
     const model = buildMenuModel(recents, { isMac: false });
     const recent = model.menus

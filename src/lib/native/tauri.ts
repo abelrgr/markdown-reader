@@ -10,7 +10,13 @@ import { load } from '@tauri-apps/plugin-store';
 import { Menu } from '@tauri-apps/api/menu';
 import { dirname, isMarkdownPath, MARKDOWN_EXTENSIONS } from '../fs/paths';
 import { isEventForFile } from './watch-filter';
-import { NativeError, type AppErrorCode, type NativeApi, type OpenedDocument } from './types';
+import {
+  NativeError,
+  type AppErrorCode,
+  type FolderListing,
+  type NativeApi,
+  type OpenedDocument,
+} from './types';
 import type { MenuItemModel, MenuModel } from '../menu';
 
 function nativeMenuItem(item: MenuItemModel, onAction: (id: string) => void): object {
@@ -68,6 +74,17 @@ export const tauriNative: NativeApi = {
       throw parseError(error);
     }
   },
+  async openFolder(path): Promise<FolderListing> {
+    try {
+      return await invoke<FolderListing>('open_folder', { path });
+    } catch (error) {
+      throw parseError(error);
+    }
+  },
+  async pickFolder(): Promise<string | null> {
+    const result = await open({ multiple: false, directory: true });
+    return typeof result === 'string' ? result : null;
+  },
   pathsExist: (paths) => invoke<boolean[]>('paths_exist', { paths }),
   takeStartupPaths: () => invoke<string[]>('take_startup_paths'),
   onOpenPaths: (cb) => listen<string[]>('open-paths', (event) => cb(event.payload)),
@@ -106,6 +123,9 @@ export const tauriNative: NativeApi = {
       },
       { recursive: false, delayMs: 250 },
     );
+  },
+  async watchFolder(root, onChange) {
+    return watch(root, onChange, { recursive: true, delayMs: 500 });
   },
   openExternal: openUrl,
   revealInFolder: revealItemInDir,

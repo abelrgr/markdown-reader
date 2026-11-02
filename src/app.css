@@ -223,6 +223,47 @@ button {
   margin: 0 0 0.75rem;
   font-size: 1rem;
 }
+.sidebar-tabs {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+.sidebar-tabs button[aria-selected='true'] {
+  font-weight: 700;
+  border-bottom: 2px solid currentColor;
+}
+.file-tree,
+.file-tree ul {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.file-tree {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+.file-tree ul {
+  padding-left: 0.8rem;
+}
+.file-tree button {
+  width: 100%;
+  overflow: hidden;
+  border: 0;
+  padding: 0.25rem;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.folder-truncated {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+}
 .sidebar nav {
   display: block;
   flex: 1 1 auto;

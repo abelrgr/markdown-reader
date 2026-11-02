@@ -1,8 +1,10 @@
 mod documents;
 mod error;
+mod folders;
 mod startup;
 
 use documents::{open_document, paths_exist};
+use folders::open_folder;
 use startup::{collect_paths, take_startup_paths, StartupPaths};
 use std::path::Path;
 use std::sync::Mutex;
@@ -52,6 +54,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             open_document,
             paths_exist,
+            open_folder,
             take_startup_paths
         ])
         .build(tauri::generate_context!())

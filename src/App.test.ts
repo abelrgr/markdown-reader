@@ -8,6 +8,8 @@ vi.mock('./lib/state/app.svelte', () => ({
   syncFileWatchers: vi.fn(),
   isDropInside: () => false,
   openFromDialog: vi.fn(),
+  openFolderFromDialog: vi.fn(),
+  openFolderPath: vi.fn(),
   openPaths: vi.fn(),
   pinRecent: vi.fn(),
   recents: { items: [] },

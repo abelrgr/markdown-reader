@@ -21,6 +21,19 @@ export interface OpenedDocument {
   encoding: string;
 }
 
+export interface FileEntry {
+  path: string;
+  relPath: string;
+  name: string;
+  modifiedMs: number;
+}
+
+export interface FolderListing {
+  root: string;
+  entries: FileEntry[];
+  truncated: boolean;
+}
+
 export type Unlisten = () => void;
 export type FileChange = 'modified' | 'removed';
 export interface KeyValueStore {
@@ -30,6 +43,8 @@ export interface KeyValueStore {
 
 export interface NativeApi {
   openDocument(path: string): Promise<OpenedDocument>;
+  openFolder(path: string): Promise<FolderListing>;
+  pickFolder(): Promise<string | null>;
   pathsExist(paths: string[]): Promise<boolean[]>;
   takeStartupPaths(): Promise<string[]>;
   onOpenPaths(cb: (paths: string[]) => void): Promise<Unlisten>;
@@ -39,6 +54,7 @@ export interface NativeApi {
     drop: (paths: string[]) => void;
   }): Promise<Unlisten>;
   watchFile(path: string, onChange: (change: FileChange) => void): Promise<Unlisten>;
+  watchFolder(root: string, onChange: () => void): Promise<Unlisten>;
   openExternal(url: string): Promise<void>;
   revealInFolder(path: string): Promise<void>;
   toAssetUrl(absPath: string): string;

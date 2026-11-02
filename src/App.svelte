@@ -14,6 +14,7 @@
     disposeApp,
     initApp,
     isDropInside,
+    openFolderPath,
     openPaths,
     syncFileWatchers,
     tabs,
@@ -58,8 +59,12 @@
     void native.setMenu(
       buildMenuModel(recents.items, { isMac: /Mac|iPhone|iPad/.test(navigator.platform) }),
       (id) => {
-        if (id.startsWith('recent:')) void openPaths([id.slice(7)]);
-        else void runCommand(id as CommandId);
+        if (id.startsWith('recent:')) {
+          const path = id.slice(7);
+          const recent = recents.items.find((entry) => entry.path === path);
+          if (recent?.kind === 'folder') void openFolderPath(path);
+          else void openPaths([path]);
+        } else void runCommand(id as CommandId);
       },
     );
   });

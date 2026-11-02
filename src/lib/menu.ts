@@ -30,6 +30,12 @@ export function buildMenuModel(recents: RecentEntry[], opts: { isMac: boolean })
   };
   const fileItems: MenuItemModel[] = [
     { kind: 'action', id: 'file.open', label: t('menu.open'), accelerator: 'CmdOrCtrl+O' },
+    {
+      kind: 'action',
+      id: 'file.openFolder',
+      label: t('menu.openFolder'),
+      accelerator: 'CmdOrCtrl+Shift+O',
+    },
     recentMenu,
     { kind: 'action', id: 'file.reload', label: t('menu.reload'), accelerator: 'CmdOrCtrl+R' },
     { kind: 'action', id: 'file.closeTab', label: t('menu.closeTab'), accelerator: 'CmdOrCtrl+W' },

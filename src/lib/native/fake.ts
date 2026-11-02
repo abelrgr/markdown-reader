@@ -2,6 +2,7 @@ import { basename, dirname, isMarkdownPath, normalizePath } from '../fs/paths';
 import {
   NativeError,
   type FileChange,
+  type FolderListing,
   type NativeApi,
   type OpenedDocument,
   type Unlisten,
@@ -24,6 +25,7 @@ for (const [source, content] of Object.entries(fixtureFiles)) {
 
 type E2eApi = {
   setDialogResult: (paths: string[]) => void;
+  setFolderResult: (path: string | null) => void;
   hasFile: (path: string) => boolean;
   drop: (paths: string[]) => void;
   dragOver: (inside: boolean) => void;
@@ -50,7 +52,10 @@ const dropListeners = new Set<{
   drop: (paths: string[]) => void;
 }>();
 const fileWatchers = new Map<string, Set<(change: FileChange) => void>>();
+const folderWatchers = new Map<string, Set<() => void>>();
+const knownFolders = new Set<string>();
 let dialogResult: string[] = [];
+let folderResult: string | null = null;
 
 function normalized(path: string): string {
   return normalizePath(path);
@@ -58,6 +63,11 @@ function normalized(path: string): string {
 
 function trigger(path: string, change: FileChange): void {
   for (const listener of fileWatchers.get(normalized(path)) ?? []) listener(change);
+  for (const [root, listeners] of folderWatchers) {
+    if (normalized(path).startsWith(`${root.replace(/\/$/, '')}/`)) {
+      for (const listener of listeners) listener();
+    }
+  }
 }
 
 const e2e: E2eApi = {
@@ -66,6 +76,9 @@ const e2e: E2eApi = {
   },
   setDialogResult(paths) {
     dialogResult = [...paths];
+  },
+  setFolderResult(path) {
+    folderResult = path;
   },
   drop(paths) {
     for (const listener of dropListeners) listener.drop(paths.filter(isMarkdownPath));
@@ -105,8 +118,37 @@ export const fakeNative: NativeApi = {
       encoding: 'utf-8',
     };
   },
+  async openFolder(path): Promise<FolderListing> {
+    const root = normalized(path).replace(/\/$/, '');
+    knownFolders.add(root);
+    const entries = [...files.entries()]
+      .filter(([filePath]) => filePath.startsWith(`${root}/`))
+      .map(([filePath, file]) => {
+        const relPath = filePath.slice(root.length + 1).replace(/\\/g, '/');
+        return {
+          path: filePath,
+          relPath,
+          name: basename(filePath),
+          modifiedMs: file.modifiedMs,
+        };
+      });
+    if (!entries.length && !files.has(root)) throw new NativeError('NOT_FOUND', path);
+    return { root, entries, truncated: false };
+  },
+  async pickFolder(): Promise<string | null> {
+    const result = folderResult;
+    folderResult = null;
+    return result;
+  },
   async pathsExist(paths) {
-    return paths.map((path) => e2e.hasFile(path));
+    return paths.map((path) => {
+      const key = normalized(path).replace(/\/$/, '');
+      return (
+        e2e.hasFile(key) ||
+        knownFolders.has(key) ||
+        [...files.keys()].some((filePath) => filePath.startsWith(`${key}/`))
+      );
+    });
   },
   async takeStartupPaths() {
     if (typeof window === 'undefined') return [];
@@ -136,6 +178,16 @@ export const fakeNative: NativeApi = {
     return () => {
       listeners.delete(onChange);
       if (!listeners.size) fileWatchers.delete(key);
+    };
+  },
+  async watchFolder(root, onChange) {
+    const key = normalized(root);
+    const listeners = folderWatchers.get(key) ?? new Set<() => void>();
+    listeners.add(onChange);
+    folderWatchers.set(key, listeners);
+    return () => {
+      listeners.delete(onChange);
+      if (!listeners.size) folderWatchers.delete(key);
     };
   },
   async openExternal(url) {

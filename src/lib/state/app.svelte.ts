@@ -4,7 +4,7 @@ import { isMarkdownPath, samePath } from '../fs/paths';
 import { detectLocale, setLocale, t } from '../i18n/index.svelte';
 import { renderMarkdown } from '../markdown/render';
 import { native } from '../native';
-import { NativeError, type AppErrorCode } from '../native/types';
+import { NativeError, type AppErrorCode, type FolderListing } from '../native/types';
 import {
   addRecent,
   normalizeRecents,
@@ -23,10 +23,13 @@ export const tabs = new TabsState({
   render: renderMarkdown,
 });
 export const recents = $state({ items: [] as RecentEntry[] });
+export const workspace = $state({ listing: null as FolderListing | null });
 export const appStatus = $state({ ready: false });
 let initialized = false;
 let initializing: Promise<void> | null = null;
 let appCleanup: (() => void) | null = null;
+let folderUnlisten: (() => void) | undefined;
+let watchedFolderRoot: string | null = null;
 const fileWatchers = new Map<string, { cancelled: boolean; unlisten?: () => void }>();
 let dropInside = $state(false);
 export function isDropInside(): boolean {
@@ -101,6 +104,43 @@ export async function openPaths(paths: string[]): Promise<void> {
 export async function openFromDialog(): Promise<void> {
   try {
     await openPaths(await native.pickMarkdownFiles());
+  } catch (error: unknown) {
+    notifyError(error);
+  }
+}
+
+export async function openFolderPath(path: string): Promise<void> {
+  try {
+    const listing = await native.openFolder(path);
+    workspace.listing = listing;
+    recents.items = addRecent(recents.items, listing.root, Date.now(), 'folder');
+    await persistRecents();
+
+    if (watchedFolderRoot !== listing.root) {
+      folderUnlisten?.();
+      folderUnlisten = undefined;
+      watchedFolderRoot = null;
+      const unlisten = await native.watchFolder(listing.root, () => {
+        if (workspace.listing?.root !== listing.root) return;
+        void native
+          .openFolder(listing.root)
+          .then((updated) => {
+            workspace.listing = updated;
+          })
+          .catch(notifyError);
+      });
+      folderUnlisten = unlisten;
+      watchedFolderRoot = listing.root;
+    }
+  } catch (error: unknown) {
+    notifyError(error);
+  }
+}
+
+export async function openFolderFromDialog(): Promise<void> {
+  try {
+    const path = await native.pickFolder();
+    if (path) await openFolderPath(path);
   } catch (error: unknown) {
     notifyError(error);
   }
@@ -215,6 +255,10 @@ async function initializeApp(): Promise<void> {
 
 export function disposeApp(): void {
   appCleanup?.();
+  folderUnlisten?.();
+  folderUnlisten = undefined;
+  watchedFolderRoot = null;
+  workspace.listing = null;
   for (const watcher of fileWatchers.values()) {
     watcher.cancelled = true;
     watcher.unlisten?.();

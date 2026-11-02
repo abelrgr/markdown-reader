@@ -1,12 +1,13 @@
 import { native } from './native';
 import { t } from './i18n/index.svelte';
 import type { MessageKey } from './i18n/en';
-import { openFromDialog, recents, tabs } from './state/app.svelte';
+import { openFolderFromDialog, openFromDialog, recents, tabs } from './state/app.svelte';
 import { settings } from './state/settings.svelte';
 import { registerCommands, type Command, type CommandId } from './commands';
 
 const titles: Partial<Record<CommandId, MessageKey>> = {
   'file.open': 'menu.open',
+  'file.openFolder': 'menu.openFolder',
   'file.closeTab': 'menu.closeTab',
   'file.reload': 'menu.reload',
   'file.clearRecents': 'menu.clearRecents',
@@ -27,6 +28,7 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
 };
 const shortcuts: Partial<Record<CommandId, string[]>> = {
   'file.open': ['Mod+O'],
+  'file.openFolder': ['Mod+Shift+O'],
   'file.closeTab': ['Mod+W'],
   'file.reload': ['Mod+R', 'F5'],
   'app.quit': ['Mod+Q'],
@@ -44,6 +46,7 @@ const shortcuts: Partial<Record<CommandId, string[]>> = {
 export function registerAppCommands(): void {
   const actions: Record<CommandId, () => void | Promise<void>> = {
     'file.open': openFromDialog,
+    'file.openFolder': openFolderFromDialog,
     'file.closeTab': () => {
       if (tabs.active) tabs.close(tabs.active.id);
     },

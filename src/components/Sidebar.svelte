@@ -3,6 +3,7 @@
   import { t } from '../lib/i18n/index.svelte';
   import { tabs } from '../lib/state/app.svelte';
   import type { TocItem } from '../lib/markdown/types';
+  import FileTree from './FileTree.svelte';
 
   const VIRTUALIZE_AFTER = 500;
   const ROW_HEIGHT = 28;
@@ -10,9 +11,10 @@
 
   let { toc }: { toc: TocItem[] } = $props();
   let activeId = $state('');
-  let nav: HTMLElement;
+  let nav = $state<HTMLElement>();
   let scrollTop = $state(0);
   let viewportHeight = $state(0);
+  let activeSection = $state<'contents' | 'files'>('contents');
 
   const virtualized = $derived(toc.length > VIRTUALIZE_AFTER);
   const firstIndex = $derived(
@@ -82,22 +84,50 @@
 </script>
 
 <aside class="sidebar" data-testid="sidebar" aria-label={t('sidebar.tableOfContents')}>
-  <h2>{t('sidebar.tableOfContents')}</h2>
-  <nav
-    bind:this={nav}
-    class:virtualized
-    onscroll={updateVirtualWindow}
-    aria-label={t('sidebar.tableOfContents')}
-  >
-    {#if virtualized}
-      <div class="toc-virtual-space" style={`height:${toc.length * ROW_HEIGHT}px`}>
-        {#each visibleItems as item, index (item.id)}
+  <div class="sidebar-tabs" role="tablist" aria-label={t('sidebar.sections')}>
+    <button
+      role="tab"
+      aria-selected={activeSection === 'contents'}
+      onclick={() => (activeSection = 'contents')}>{t('sidebar.contents')}</button
+    >
+    <button
+      role="tab"
+      aria-selected={activeSection === 'files'}
+      onclick={() => (activeSection = 'files')}>{t('sidebar.files')}</button
+    >
+  </div>
+  {#if activeSection === 'contents'}
+    <h2>{t('sidebar.tableOfContents')}</h2>
+    <nav
+      bind:this={nav}
+      class:virtualized
+      onscroll={updateVirtualWindow}
+      aria-label={t('sidebar.tableOfContents')}
+    >
+      {#if virtualized}
+        <div class="toc-virtual-space" style={`height:${toc.length * ROW_HEIGHT}px`}>
+          {#each visibleItems as item, index (item.id)}
+            <button
+              class:active={activeId === item.id}
+              class="toc-virtual-item"
+              aria-current={activeId === item.id ? 'location' : undefined}
+              data-testid="toc-item"
+              style={`--depth:${item.depth};--row:${firstIndex + index}`}
+              onclick={() => goTo(item.id)}
+              >{item.text}{#if activeId === item.id}<span
+                  class="sr-only"
+                  data-testid="toc-item-active">{item.text}</span
+                >{/if}</button
+            >
+          {/each}
+        </div>
+      {:else}
+        {#each visibleItems as item (item.id)}
           <button
             class:active={activeId === item.id}
-            class="toc-virtual-item"
             aria-current={activeId === item.id ? 'location' : undefined}
             data-testid="toc-item"
-            style={`--depth:${item.depth};--row:${firstIndex + index}`}
+            style={`--depth:${item.depth}`}
             onclick={() => goTo(item.id)}
             >{item.text}{#if activeId === item.id}<span
                 class="sr-only"
@@ -105,20 +135,10 @@
               >{/if}</button
           >
         {/each}
-      </div>
-    {:else}
-      {#each visibleItems as item (item.id)}
-        <button
-          class:active={activeId === item.id}
-          aria-current={activeId === item.id ? 'location' : undefined}
-          data-testid="toc-item"
-          style={`--depth:${item.depth}`}
-          onclick={() => goTo(item.id)}
-          >{item.text}{#if activeId === item.id}<span class="sr-only" data-testid="toc-item-active"
-              >{item.text}</span
-            >{/if}</button
-        >
-      {/each}
-    {/if}
-  </nav>
+      {/if}
+    </nav>
+  {:else}
+    <h2>{t('sidebar.files')}</h2>
+    <FileTree />
+  {/if}
 </aside>

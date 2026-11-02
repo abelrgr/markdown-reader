@@ -6,6 +6,7 @@ export interface Command {
 }
 export type CommandId =
   | 'file.open'
+  | 'file.openFolder'
   | 'file.closeTab'
   | 'file.reload'
   | 'file.clearRecents'

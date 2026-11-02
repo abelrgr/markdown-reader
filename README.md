@@ -4,11 +4,12 @@
 
 Markdown Reader is a secure, cross-platform desktop app for reading Markdown files. It is built with Tauri 2, Rust, Svelte 5, TypeScript, and Vite.
 
-## Phase 1 features
+## Features
 
 - Safe Markdown rendering with GitHub Flavored Markdown, alerts, heading links, and Shiki syntax highlighting.
 - Inline and display math rendered locally with KaTeX (`$...$` and `$$` on separate lines).
 - Mermaid diagrams rendered on demand with strict SVG sanitization and light/dark themes.
+- Folder workspaces with a recursive, `.gitignore`-aware Markdown tree and live refresh.
 - Multiple tabs, drag-and-drop, recent files, pinned files, and session/scroll restoration.
 - Table of contents, word count, estimated reading time, and encoding information.
 - Relative local images, optional blocking of remote images, and automatic file reload while preserving the reading position.

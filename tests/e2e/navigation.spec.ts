@@ -52,14 +52,14 @@ test('keeps the tab header and status bar fixed while only the document scrolls'
 }) => {
   await openApp(page, { startup: ['/fx/headings.md'] });
   const viewer = page.getByTestId('viewer');
-  const tabbar = page.getByRole('tablist');
+  const tabbar = page.locator('header[role="tablist"]');
   const statusBar = page.getByTestId('status-bar');
   await expect(viewer).toBeVisible();
   await expect(tabbar).toBeVisible();
   await expect(statusBar).toBeVisible();
 
   const initial = await page.evaluate(() => ({
-    tabTop: document.querySelector('[role="tablist"]')!.getBoundingClientRect().top,
+    tabTop: document.querySelector('header[role="tablist"]')!.getBoundingClientRect().top,
     statusBottom: document.querySelector('[data-testid="status-bar"]')!.getBoundingClientRect()
       .bottom,
     viewportHeight: window.innerHeight,
