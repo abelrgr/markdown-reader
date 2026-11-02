@@ -28,6 +28,7 @@
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import { buildMenuModel } from './lib/menu';
   import { runCommand, type CommandId } from './lib/commands';
+  import FindBar from './components/FindBar.svelte';
 
   onMount(() => {
     registerAppCommands();
@@ -67,6 +68,7 @@
 </script>
 
 <div class="app-shell">
+  <FindBar />
   {#if tabs.active}
     <TabBar />
     <div class="workspace">

@@ -2,6 +2,9 @@
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+::highlight(find) { background: #fde68a; }
+::highlight(find-current) { background: #f59e0b; }
+
 :root {
   color-scheme: light;
   --reader-font: system-ui, sans-serif;
