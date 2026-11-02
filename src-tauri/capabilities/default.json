@@ -1,11 +1,21 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "enables the default permissions",
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
-    "core:default"
+    "core:default",
+    "core:window:allow-set-title",
+    "core:window:allow-set-fullscreen",
+    "core:webview:allow-set-webview-zoom",
+    "core:menu:default",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "fs:allow-watch",
+    "fs:allow-unwatch",
+    "store:default",
+    "opener:allow-open-url",
+    "opener:allow-reveal-item-in-dir",
+    "window-state:default",
+    "log:default"
   ]
 }
