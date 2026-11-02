@@ -13,6 +13,11 @@ export default defineConfig({
   envPrefix: ['VITE_', 'TAURI_ENV_'],
   resolve: {
     alias: [
+      // rehype-katex serializes through this parser inside a Worker, where DOMParser is unavailable.
+      {
+        find: /^hast-util-from-html-isomorphic$/,
+        replacement: require.resolve('hast-util-from-html-isomorphic'),
+      },
       {
         find: /^decode-named-character-reference$/,
         replacement: require.resolve('decode-named-character-reference'),

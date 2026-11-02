@@ -17,6 +17,21 @@ describe('renderMarkdownCore', () => {
     expect(r.html).toContain('<table>');
     expect(r.html).toContain('<td>1</td>');
   });
+  test('renders inline math with KaTeX', async () => {
+    expect((await renderMarkdownCore('$a^2$')).html).toContain('class="katex"');
+  });
+  test('renders display math with KaTeX', async () => {
+    expect((await renderMarkdownCore('$$\n\\frac{1}{2}\n$$')).html).toContain('katex-display');
+  });
+  test('keeps malformed math as a KaTeX error instead of throwing', async () => {
+    const result = await renderMarkdownCore('$\\frac{$');
+    expect(result.html).toContain('katex-error');
+  });
+  test('does not parse an escaped dollar as math', async () => {
+    const result = await renderMarkdownCore('cuesta \\$5');
+    expect(result.html).not.toContain('katex');
+    expect(result.html).toContain('$5');
+  });
   test('task list is disabled checkbox', async () => {
     const r = await renderMarkdownCore('- [x] hecho');
     expect(r.html).toMatch(
