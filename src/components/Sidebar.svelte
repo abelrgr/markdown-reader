@@ -4,6 +4,7 @@
   import { tabs } from '../lib/state/app.svelte';
   import type { TocItem } from '../lib/markdown/types';
   import FileTree from './FileTree.svelte';
+  import SearchPanel from './SearchPanel.svelte';
 
   const VIRTUALIZE_AFTER = 500;
   const ROW_HEIGHT = 28;
@@ -14,7 +15,16 @@
   let nav = $state<HTMLElement>();
   let scrollTop = $state(0);
   let viewportHeight = $state(0);
-  let activeSection = $state<'contents' | 'files'>('contents');
+  let activeSection = $state<'contents' | 'files' | 'search'>('contents');
+
+  function showSearch(): void {
+    activeSection = 'search';
+  }
+
+  $effect(() => {
+    window.addEventListener('app:searchFolder', showSearch);
+    return () => window.removeEventListener('app:searchFolder', showSearch);
+  });
 
   const virtualized = $derived(toc.length > VIRTUALIZE_AFTER);
   const firstIndex = $derived(
@@ -95,6 +105,11 @@
       aria-selected={activeSection === 'files'}
       onclick={() => (activeSection = 'files')}>{t('sidebar.files')}</button
     >
+    <button
+      role="tab"
+      aria-selected={activeSection === 'search'}
+      onclick={() => (activeSection = 'search')}>{t('search.title')}</button
+    >
   </div>
   {#if activeSection === 'contents'}
     <h2>{t('sidebar.tableOfContents')}</h2>
@@ -137,8 +152,11 @@
         {/each}
       {/if}
     </nav>
-  {:else}
+  {:else if activeSection === 'files'}
     <h2>{t('sidebar.files')}</h2>
     <FileTree />
+  {:else}
+    <h2>{t('search.title')}</h2>
+    <SearchPanel />
   {/if}
 </aside>

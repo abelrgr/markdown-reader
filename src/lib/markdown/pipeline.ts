@@ -17,6 +17,7 @@ import { rehypeMarkLocalImages } from './plugins/local-images';
 import { rehypeFixClobberedFragments } from './plugins/fix-clobbered-fragments';
 import { rehypeSafeMarkdownUrls } from './plugins/safe-urls';
 import { rehypeMermaidBlocks } from './plugins/mermaid';
+import { rehypeSourceLines } from './plugins/source-lines';
 
 export function createProcessor(
   highlighter: HighlighterCore | null,
@@ -41,6 +42,7 @@ export function createProcessor(
   if (processAlerts) processor.use(rehypeAlerts);
   processor.use(rehypeHeadings);
   processor.use(rehypeMermaidBlocks);
+  processor.use(rehypeSourceLines);
   if (highlighter) {
     processor.use(() =>
       rehypeShikiFromHighlighter(highlighter, {

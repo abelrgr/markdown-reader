@@ -13,6 +13,7 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'file.clearRecents': 'menu.clearRecents',
   'nav.quickOpen': 'menu.quickOpen',
   'nav.commandPalette': 'menu.commandPalette',
+  'nav.searchFolder': 'menu.searchFolder',
   'app.quit': 'app.quit',
   'view.toggleSidebar': 'sidebar.toggle',
   'view.find': 'menu.find',
@@ -33,6 +34,7 @@ const shortcuts: Partial<Record<CommandId, string[]>> = {
   'file.openFolder': ['Mod+Shift+O'],
   'nav.quickOpen': ['Mod+P'],
   'nav.commandPalette': ['Mod+Shift+P'],
+  'nav.searchFolder': ['Mod+Shift+F'],
   'file.closeTab': ['Mod+W'],
   'file.reload': ['Mod+R', 'F5'],
   'app.quit': ['Mod+Q'],
@@ -66,6 +68,9 @@ export function registerAppCommands(): void {
     },
     'nav.commandPalette': () => {
       window.dispatchEvent(new CustomEvent('app:commandPalette'));
+    },
+    'nav.searchFolder': () => {
+      window.dispatchEvent(new CustomEvent('app:searchFolder'));
     },
     'app.quit': () => native.quit(),
     'view.toggleSidebar': () => settings.update({ showSidebar: !settings.value.showSidebar }),

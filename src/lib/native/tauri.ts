@@ -14,6 +14,7 @@ import {
   NativeError,
   type AppErrorCode,
   type FolderListing,
+  type SearchResults,
   type NativeApi,
   type OpenedDocument,
 } from './types';
@@ -126,6 +127,13 @@ export const tauriNative: NativeApi = {
   },
   async watchFolder(root, onChange) {
     return watch(root, onChange, { recursive: true, delayMs: 500 });
+  },
+  async searchFolder(root, query, caseSensitive): Promise<SearchResults> {
+    try {
+      return await invoke<SearchResults>('search_folder', { root, query, caseSensitive });
+    } catch (error) {
+      throw parseError(error);
+    }
   },
   openExternal: openUrl,
   revealInFolder: revealItemInDir,

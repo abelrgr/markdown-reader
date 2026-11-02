@@ -14,7 +14,7 @@ describe('renderMarkdownCore', () => {
 
   test('GFM table', async () => {
     const r = await renderMarkdownCore('| a | b |\n|---|---|\n| 1 | 2 |');
-    expect(r.html).toContain('<table>');
+    expect(r.html).toContain('<table data-line="1">');
     expect(r.html).toContain('<td>1</td>');
   });
   test('renders inline math with KaTeX', async () => {
@@ -37,6 +37,12 @@ describe('renderMarkdownCore', () => {
     expect(result.html).toContain('class="mermaid-block"');
     expect(result.html).toContain('data-source="graph TD');
     expect(result.html).not.toContain('class="shiki"');
+  });
+  test('adds original Markdown source lines to searchable rendered blocks', async () => {
+    const result = await renderMarkdownCore('# A\n\nparagraph\n\n- item');
+    expect(result.html).toContain('data-line="1"');
+    expect(result.html).toContain('data-line="3"');
+    expect(result.html).toContain('data-line="5"');
   });
   test('task list is disabled checkbox', async () => {
     const r = await renderMarkdownCore('- [x] hecho');

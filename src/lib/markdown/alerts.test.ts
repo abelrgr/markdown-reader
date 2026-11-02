@@ -10,6 +10,6 @@ describe('GitHub alerts', () => {
     expect(r.html).toContain('cuidado');
   });
   test('normal blockquote untouched', async () => {
-    expect((await renderMarkdownCore('> cita')).html).toContain('<blockquote>');
+    expect((await renderMarkdownCore('> cita')).html).toContain('<blockquote data-line="1">');
   });
 });

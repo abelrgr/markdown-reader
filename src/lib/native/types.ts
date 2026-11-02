@@ -34,6 +34,19 @@ export interface FolderListing {
   truncated: boolean;
 }
 
+export interface SearchHit {
+  path: string;
+  relPath: string;
+  line: number;
+  column: number;
+  preview: string;
+}
+
+export interface SearchResults {
+  hits: SearchHit[];
+  truncated: boolean;
+}
+
 export type Unlisten = () => void;
 export type FileChange = 'modified' | 'removed';
 export interface KeyValueStore {
@@ -55,6 +68,7 @@ export interface NativeApi {
   }): Promise<Unlisten>;
   watchFile(path: string, onChange: (change: FileChange) => void): Promise<Unlisten>;
   watchFolder(root: string, onChange: () => void): Promise<Unlisten>;
+  searchFolder(root: string, query: string, caseSensitive: boolean): Promise<SearchResults>;
   openExternal(url: string): Promise<void>;
   revealInFolder(path: string): Promise<void>;
   toAssetUrl(absPath: string): string;

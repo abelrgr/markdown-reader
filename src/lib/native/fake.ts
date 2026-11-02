@@ -3,6 +3,7 @@ import {
   NativeError,
   type FileChange,
   type FolderListing,
+  type SearchResults,
   type NativeApi,
   type OpenedDocument,
   type Unlisten,
@@ -34,6 +35,7 @@ type E2eApi = {
   deleteFile: (path: string) => void;
   openedUrls: string[];
   openPathsReady: boolean;
+  searchDelayMs?: Record<string, number>;
   zoom?: number;
   fullscreen?: boolean;
   menu?: MenuModel;
@@ -101,6 +103,7 @@ const e2e: E2eApi = {
   },
   openedUrls: [],
   openPathsReady: false,
+  searchDelayMs: {},
 };
 if (typeof window !== 'undefined') window.__e2e = e2e;
 
@@ -189,6 +192,30 @@ export const fakeNative: NativeApi = {
       listeners.delete(onChange);
       if (!listeners.size) folderWatchers.delete(key);
     };
+  },
+  async searchFolder(root, query, caseSensitive): Promise<SearchResults> {
+    const delay = e2e.searchDelayMs?.[query] ?? 0;
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+    if (!query.trim()) return { hits: [], truncated: false };
+    const normalizedQuery = caseSensitive ? query : query.toLocaleLowerCase();
+    const hits: SearchResults['hits'] = [];
+    for (const [path, file] of files) {
+      if (!path.startsWith(`${normalized(root).replace(/\/$/, '')}/`)) continue;
+      const relPath = path.slice(root.length + 1).replace(/\\/g, '/');
+      for (const [index, line] of file.content.split(/\r?\n/).entries()) {
+        const haystack = caseSensitive ? line : line.toLocaleLowerCase();
+        const column = haystack.indexOf(normalizedQuery);
+        if (column < 0) continue;
+        hits.push({
+          path,
+          relPath,
+          line: index + 1,
+          column: column + 1,
+          preview: line.slice(0, 200),
+        });
+      }
+    }
+    return { hits: hits.slice(0, 500), truncated: hits.length > 500 };
   },
   async openExternal(url) {
     e2e.openedUrls.push(url);

@@ -24,6 +24,12 @@ export const tabs = new TabsState({
 });
 export const recents = $state({ items: [] as RecentEntry[] });
 export const workspace = $state({ listing: null as FolderListing | null });
+export const folderSearch = $state({
+  query: '',
+  hits: [] as import('../native/types').SearchHit[],
+  truncated: false,
+  searching: false,
+});
 export const appStatus = $state({ ready: false });
 let initialized = false;
 let initializing: Promise<void> | null = null;
@@ -259,6 +265,10 @@ export function disposeApp(): void {
   folderUnlisten = undefined;
   watchedFolderRoot = null;
   workspace.listing = null;
+  folderSearch.query = '';
+  folderSearch.hits = [];
+  folderSearch.truncated = false;
+  folderSearch.searching = false;
   for (const watcher of fileWatchers.values()) {
     watcher.cancelled = true;
     watcher.unlisten?.();
@@ -266,6 +276,33 @@ export function disposeApp(): void {
   fileWatchers.clear();
   appStatus.ready = false;
   if (!initialized) initializing = null;
+}
+
+export async function searchFolder(query: string, caseSensitive = false): Promise<void> {
+  const root = workspace.listing?.root;
+  folderSearch.query = query;
+  if (!root || !query.trim()) {
+    folderSearch.hits = [];
+    folderSearch.truncated = false;
+    folderSearch.searching = false;
+    return;
+  }
+  const requestId = (folderSearch as typeof folderSearch & { requestId?: number }).requestId ?? 0;
+  const nextId = requestId + 1;
+  (folderSearch as typeof folderSearch & { requestId?: number }).requestId = nextId;
+  folderSearch.searching = true;
+  try {
+    const result = await native.searchFolder(root, query, caseSensitive);
+    if ((folderSearch as typeof folderSearch & { requestId?: number }).requestId !== nextId) return;
+    folderSearch.hits = result.hits;
+    folderSearch.truncated = result.truncated;
+  } catch (error: unknown) {
+    if ((folderSearch as typeof folderSearch & { requestId?: number }).requestId === nextId)
+      notifyError(error);
+  } finally {
+    if ((folderSearch as typeof folderSearch & { requestId?: number }).requestId === nextId)
+      folderSearch.searching = false;
+  }
 }
 
 export function syncFileWatchers(openTabs: { id: string; path: string }[]): void {

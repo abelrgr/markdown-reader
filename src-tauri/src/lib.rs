@@ -1,10 +1,12 @@
 mod documents;
 mod error;
 mod folders;
+mod search;
 mod startup;
 
 use documents::{open_document, paths_exist};
 use folders::open_folder;
+use search::search_folder;
 use startup::{collect_paths, take_startup_paths, StartupPaths};
 use std::path::Path;
 use std::sync::Mutex;
@@ -55,6 +57,7 @@ pub fn run() {
             open_document,
             paths_exist,
             open_folder,
+            search_folder,
             take_startup_paths
         ])
         .build(tauri::generate_context!())

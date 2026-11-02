@@ -12,6 +12,7 @@ export type CommandId =
   | 'file.clearRecents'
   | 'nav.quickOpen'
   | 'nav.commandPalette'
+  | 'nav.searchFolder'
   | 'app.quit'
   | 'view.toggleSidebar'
   | 'view.find'
