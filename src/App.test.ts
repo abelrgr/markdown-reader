@@ -4,6 +4,8 @@ vi.mock('./lib/state/app.svelte', () => ({
   applyTheme: vi.fn(),
   initApp: vi.fn(() => Promise.resolve()),
   disposeApp: vi.fn(),
+  appStatus: { ready: false },
+  syncFileWatchers: vi.fn(),
   isDropInside: () => false,
   openFromDialog: vi.fn(),
   openPaths: vi.fn(),
@@ -14,7 +16,12 @@ vi.mock('./lib/state/app.svelte', () => ({
   tabs: { active: null, tabs: [], activeId: null },
 }));
 vi.mock('./lib/native', () => ({
-  native: { setWindowTitle: vi.fn(), setZoom: vi.fn(), setMenu: vi.fn(() => Promise.resolve()) },
+  native: {
+    setWindowTitle: vi.fn(),
+    setZoom: vi.fn(),
+    setMenu: vi.fn(() => Promise.resolve()),
+    store: { set: vi.fn(() => Promise.resolve()) },
+  },
 }));
 import App from './App.svelte';
 

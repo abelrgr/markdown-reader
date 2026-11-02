@@ -9,11 +9,13 @@
   import StatusBar from './components/StatusBar.svelte';
   import MetaCard from './components/MetaCard.svelte';
   import {
+    appStatus,
     applyTheme,
     disposeApp,
     initApp,
     isDropInside,
     openPaths,
+    syncFileWatchers,
     tabs,
   } from './lib/state/app.svelte';
   import { settings } from './lib/state/settings.svelte';
@@ -64,6 +66,20 @@
   $effect(() => {
     const active = tabs.active;
     void native.setWindowTitle(active ? `${active.name} — ${t('app.name')}` : t('app.name'));
+  });
+  $effect(() => {
+    if (appStatus.ready) syncFileWatchers(tabs.tabs.map(({ id, path }) => ({ id, path })));
+  });
+  $effect(() => {
+    if (!appStatus.ready) return;
+    const snapshot = {
+      tabs: tabs.tabs.map(({ path, scrollTop }) => ({ path, scrollTop })),
+      activePath: tabs.active?.path ?? null,
+    };
+    const timer = setTimeout(() => {
+      void native.store.set('session', snapshot);
+    }, 500);
+    return () => clearTimeout(timer);
   });
 </script>
 
