@@ -32,6 +32,12 @@ describe('renderMarkdownCore', () => {
     expect(result.html).not.toContain('katex');
     expect(result.html).toContain('$5');
   });
+  test('preserves Mermaid source for main-thread rendering instead of highlighting it', async () => {
+    const result = await renderMarkdownCore('```mermaid\ngraph TD\n  A-->B\n```');
+    expect(result.html).toContain('class="mermaid-block"');
+    expect(result.html).toContain('data-source="graph TD');
+    expect(result.html).not.toContain('class="shiki"');
+  });
   test('task list is disabled checkbox', async () => {
     const r = await renderMarkdownCore('- [x] hecho');
     expect(r.html).toMatch(

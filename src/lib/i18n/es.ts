@@ -28,6 +28,7 @@ export const es: Record<MessageKey, string> = {
   'viewer.copy': 'Copiar',
   'viewer.copied': 'Copiado',
   'viewer.imageBlocked': 'Imagen bloqueada',
+  'viewer.mermaidError': 'No se pudo representar el diagrama',
   'viewer.openInFolder': 'Abrir en la carpeta',
   'error.NOT_FOUND': 'Archivo no encontrado',
   'error.UNSUPPORTED_EXTENSION': 'Tipo de archivo no compatible',

@@ -8,13 +8,12 @@ Markdown Reader is a secure, cross-platform desktop app for reading Markdown fil
 
 - Safe Markdown rendering with GitHub Flavored Markdown, alerts, heading links, and Shiki syntax highlighting.
 - Inline and display math rendered locally with KaTeX (`$...$` and `$$` on separate lines).
+- Mermaid diagrams rendered on demand with strict SVG sanitization and light/dark themes.
 - Multiple tabs, drag-and-drop, recent files, pinned files, and session/scroll restoration.
 - Table of contents, word count, estimated reading time, and encoding information.
 - Relative local images, optional blocking of remote images, and automatic file reload while preserving the reading position.
 - Find in document, English and Spanish UI, keyboard shortcuts, native menus, and configurable theme and typography.
 - Windows file association, single-instance handling, and command-line file opening.
-
-Mermaid diagrams are planned for Phase 2.
 
 ## Download
 

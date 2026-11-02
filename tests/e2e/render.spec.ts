@@ -50,3 +50,24 @@ test('resolves a local image whose relative path contains spaces and accents', a
     .poll(() => image.evaluate((element) => (element as HTMLImageElement).naturalWidth))
     .toBe(1);
 });
+
+test('renders valid Mermaid and keeps invalid diagram source visible', async ({ page }) => {
+  await openApp(page);
+  await expect.poll(() => page.evaluate(() => window.__e2e.openPathsReady)).toBe(true);
+  expect(await page.evaluate(() => window.__e2e.hasFile('/fx/mermaid.md'))).toBe(true);
+  await page.evaluate(() => window.__e2e.emitOpenPaths(['/fx/mermaid.md']));
+  const viewer = page.getByTestId('viewer');
+  await expect(viewer).toContainText('The rest of this document should remain visible.');
+  await expect(viewer.locator('.mermaid-block').first().locator('svg')).toBeVisible();
+  const invalid = viewer.locator('[data-testid="mermaid-error"]');
+  await expect(invalid).toContainText('not a valid diagram');
+  await expect(invalid.locator('pre code')).toHaveText('this is not a valid diagram');
+  await expect(invalid).toContainText('Diagram could not be rendered');
+
+  const diagram = viewer.locator('.mermaid-block').first().locator('svg');
+  const lightSvg = await diagram.evaluate((svg) => svg.outerHTML);
+  await page.keyboard.press('ControlOrMeta+,');
+  await page.getByLabel('Theme').selectOption('dark');
+  await page.getByRole('button', { name: 'Close dialog' }).click();
+  await expect.poll(() => diagram.evaluate((svg) => svg.outerHTML)).not.toBe(lightSvg);
+});

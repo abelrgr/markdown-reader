@@ -245,6 +245,20 @@ button {
   position: relative;
   width: 100%;
 }
+.mermaid-block {
+  overflow-x: auto;
+}
+.mermaid-block svg {
+  max-width: 100%;
+  height: auto;
+}
+.mermaid-invalid pre {
+  display: grid;
+  gap: 0.5rem;
+}
+.mermaid-error-message {
+  color: #b91c1c;
+}
 .sidebar nav button.toc-virtual-item {
   position: absolute;
   top: calc(var(--row) * 28px);

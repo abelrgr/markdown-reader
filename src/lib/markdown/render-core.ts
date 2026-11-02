@@ -29,6 +29,7 @@ export async function renderMarkdownCore(source: string): Promise<RenderResult> 
     const loaded = new Set(highlighter.getLoadedLanguages());
     visit(mdast, 'code', (node) => {
       if (!node.lang) return;
+      if (node.lang.toLowerCase() === 'mermaid') return;
       const language = LANGUAGE_ALIASES[node.lang.toLowerCase()] ?? node.lang.toLowerCase();
       node.lang = loaded.has(language) ? language : 'text';
     });

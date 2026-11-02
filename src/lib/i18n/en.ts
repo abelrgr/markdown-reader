@@ -26,6 +26,7 @@ export const en = {
   'viewer.copy': 'Copy',
   'viewer.copied': 'Copied',
   'viewer.imageBlocked': 'Image blocked',
+  'viewer.mermaidError': 'Diagram could not be rendered',
   'viewer.openInFolder': 'Open in folder',
   'error.NOT_FOUND': 'File not found',
   'error.UNSUPPORTED_EXTENSION': 'Unsupported file type',
