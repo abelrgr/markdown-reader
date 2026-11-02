@@ -11,6 +11,8 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'file.closeTab': 'menu.closeTab',
   'file.reload': 'menu.reload',
   'file.clearRecents': 'menu.clearRecents',
+  'nav.quickOpen': 'menu.quickOpen',
+  'nav.commandPalette': 'menu.commandPalette',
   'app.quit': 'app.quit',
   'view.toggleSidebar': 'sidebar.toggle',
   'view.find': 'menu.find',
@@ -29,6 +31,8 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
 const shortcuts: Partial<Record<CommandId, string[]>> = {
   'file.open': ['Mod+O'],
   'file.openFolder': ['Mod+Shift+O'],
+  'nav.quickOpen': ['Mod+P'],
+  'nav.commandPalette': ['Mod+Shift+P'],
   'file.closeTab': ['Mod+W'],
   'file.reload': ['Mod+R', 'F5'],
   'app.quit': ['Mod+Q'],
@@ -56,6 +60,12 @@ export function registerAppCommands(): void {
     'file.clearRecents': async () => {
       recents.items = [];
       await native.store.set('recents', []);
+    },
+    'nav.quickOpen': () => {
+      window.dispatchEvent(new CustomEvent('app:quickOpen'));
+    },
+    'nav.commandPalette': () => {
+      window.dispatchEvent(new CustomEvent('app:commandPalette'));
     },
     'app.quit': () => native.quit(),
     'view.toggleSidebar': () => settings.update({ showSidebar: !settings.value.showSidebar }),

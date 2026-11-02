@@ -300,6 +300,37 @@ button {
 .mermaid-error-message {
   color: #b91c1c;
 }
+.palette-results {
+  max-height: min(55vh, 28rem);
+  overflow: auto;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.palette-results button {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 0;
+  padding: 0.55rem 0.7rem;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+.palette-results button.selected,
+.palette-results button:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+.palette-results button span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.palette-empty {
+  padding: 0.6rem;
+  opacity: 0.7;
+}
 .sidebar nav button.toc-virtual-item {
   position: absolute;
   top: calc(var(--row) * 28px);

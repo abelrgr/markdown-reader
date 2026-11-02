@@ -13,6 +13,7 @@ vi.mock('./lib/state/app.svelte', () => ({
   openPaths: vi.fn(),
   pinRecent: vi.fn(),
   recents: { items: [] },
+  workspace: { listing: null },
   removeRecent: vi.fn(),
   sortRecents: () => [],
   tabs: { active: null, tabs: [], activeId: null },

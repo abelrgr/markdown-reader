@@ -10,6 +10,8 @@ export type CommandId =
   | 'file.closeTab'
   | 'file.reload'
   | 'file.clearRecents'
+  | 'nav.quickOpen'
+  | 'nav.commandPalette'
   | 'app.quit'
   | 'view.toggleSidebar'
   | 'view.find'

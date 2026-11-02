@@ -32,6 +32,8 @@
   import { buildMenuModel } from './lib/menu';
   import { runCommand, type CommandId } from './lib/commands';
   import FindBar from './components/FindBar.svelte';
+  import QuickOpen from './components/QuickOpen.svelte';
+  import CommandPalette from './components/CommandPalette.svelte';
 
   onMount(() => {
     registerAppCommands();
@@ -90,6 +92,8 @@
 
 <div class="app-shell">
   <FindBar />
+  <QuickOpen />
+  <CommandPalette />
   {#if tabs.active}
     <TabBar />
     <div class="workspace">
