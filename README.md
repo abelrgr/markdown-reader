@@ -1,47 +1,46 @@
-# Simple Markdown Reader
+# Markdown Reader
 
-<img src="readme_assets/screenshot1.jpg" alt="Screenshot-1" style="width:30rem; height:20rem;" />
+![Markdown Reader showing a rendered Markdown document](readme_assets/markdown-reader.png)
 
-## Description
+Markdown Reader is a secure, cross-platform desktop app for reading Markdown files. It is built with Tauri 2, Rust, Svelte 5, TypeScript, and Vite.
 
-This is a markdown reader app that allows users to view markdown files. It provides a user-friendly interface for reading and navigating through markdown content.
+## Phase 1 features
 
-## Features
+- Safe Markdown rendering with GitHub Flavored Markdown, alerts, heading links, and Shiki syntax highlighting.
+- Multiple tabs, drag-and-drop, recent files, pinned files, and session/scroll restoration.
+- Table of contents, word count, estimated reading time, and encoding information.
+- Relative local images, optional blocking of remote images, and automatic file reload while preserving the reading position.
+- Find in document, English and Spanish UI, keyboard shortcuts, native menus, and configurable theme and typography.
+- Windows file association, single-instance handling, and command-line file opening.
 
-- **Markdown rendering**: The app renders markdown files into formatted content, making it easy to read and understand.
-- **Navigation**: Users can easily navigate through the markdown file using a table of contents or by scrolling through the content.
-- **Syntax highlighting**: The app highlights the syntax of code blocks within the markdown file, improving readability for developers.
-- **Customization**: Users can customize the app's appearance and behavior according to their preferences.
+Math typesetting and Mermaid diagrams are planned for Phase 2; they are not part of this release.
 
-## Usage
+## Download
 
-1. Download the compiled app from the dist folder.
-2. Run the app on your local machine.
-3. Open a markdown file using the app.
-4. Read and navigate through the markdown content.
+Installers are published as draft releases on the [GitHub Releases](https://github.com/abelrgr/markdown-reader/releases) page. The current development version is `2.0.0-beta.1`.
 
 ## Development
 
-To run the app locally:
+Requirements: Node.js 24 LTS with npm, Rust stable 1.85 or newer, and the [Tauri system prerequisites](https://v2.tauri.app/start/prerequisites/) for your operating system.
 
-1. Clone the repository: `git clone https://github.com/your-repo.git`
-2. Install dependencies: `npm install`
-3. Start the app: `npx neu run`
+```sh
+npm ci
+npm run tauri dev
+npm test
+npm run e2e
+```
 
-Feel free to modify the code and request a pull request if you have any improvements or suggestions.
+Other checks: `npm run check`, `npm run build`, `cargo test --manifest-path src-tauri/Cargo.toml`, and `cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings`.
 
-## Contributing
+## Project structure
 
-Contributions are welcome! If you have any suggestions or improvements, please submit a pull request.
+- `src/` — Svelte UI, native API boundary, Markdown pipeline, state, and DOM utilities.
+- `src-tauri/` — Rust backend and Tauri configuration.
+- `tests/e2e/` — Playwright tests and Markdown fixtures.
+- `docs/` — refactor specification, plans, and QA checklist.
+- `examples/` — sample Markdown documents for testing reader features.
+- `legacy/` — archived NeutralinoJS v1 application, retained for reference.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## TODO
-
-- [ ] Add the dropped files to the recent files list
-- [ ] Add a search feature to search for text within the markdown content
-- [ ] Implement a dark mode theme for the app
-- [ ] Add support for rendering images and other media content in the markdown file
-- [ ] Review the compiled files for the different platforms
+MIT. See [LICENSE](LICENSE).

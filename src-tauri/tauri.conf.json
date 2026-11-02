@@ -52,6 +52,11 @@
         "role": "Viewer",
         "mimeType": "text/markdown"
       }
-    ]
+    ],
+    "windows": {
+      "wix": {
+        "version": "2.0.0.2"
+      }
+    }
   }
 }
