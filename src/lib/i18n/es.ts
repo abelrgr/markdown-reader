@@ -20,6 +20,8 @@ export const es: Record<MessageKey, string> = {
   'tabs.removeRecent': 'Quitar de archivos recientes',
   'sidebar.tableOfContents': 'Índice',
   'sidebar.toggle': 'Mostrar u ocultar barra lateral',
+  'meta.title': 'Metadatos del documento',
+  'meta.more': 'Más metadatos',
   'status.words': '{count} palabras',
   'status.readingMinutes': '{count} min de lectura',
   'status.encoding': 'Codificación: {encoding}',

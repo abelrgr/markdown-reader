@@ -94,12 +94,6 @@ async function initializeApp(): Promise<void> {
   let cancelled = false;
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   const onMediaChange = (): void => applyTheme();
-  const onKeyDown = (event: KeyboardEvent): void => {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'o') {
-      event.preventDefault();
-      void openFromDialog();
-    }
-  };
 
   const cleanup = (): void => {
     if (cancelled) return;
@@ -107,7 +101,6 @@ async function initializeApp(): Promise<void> {
     pathsListener?.();
     dropListener?.();
     mediaQuery.removeEventListener('change', onMediaChange);
-    window.removeEventListener('keydown', onKeyDown);
     if (appCleanup === cleanup) appCleanup = null;
     initialized = false;
   };
@@ -132,7 +125,6 @@ async function initializeApp(): Promise<void> {
     drop: (paths) => { dropInside = false; void openPaths(paths); },
   });
   if (cancelled) { dropListener(); return; }
-  window.addEventListener('keydown', onKeyDown);
   const startup = await native.takeStartupPaths();
   if (cancelled) return;
   if (startup.length) await openPaths(startup);

@@ -18,6 +18,8 @@ export const en = {
   'tabs.removeRecent': 'Remove from recent files',
   'sidebar.tableOfContents': 'Table of contents',
   'sidebar.toggle': 'Toggle sidebar',
+  'meta.title': 'Document metadata',
+  'meta.more': 'More metadata',
   'status.words': '{count} words',
   'status.readingMinutes': '{count} min read',
   'status.encoding': 'Encoding: {encoding}',
