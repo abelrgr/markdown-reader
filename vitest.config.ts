@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [svelte()],
   test: {
     environment: 'jsdom',
+    fileParallelism: false,
     include: ['src/**/*.test.ts'],
     exclude: ['tests/e2e/**'],
   },

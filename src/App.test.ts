@@ -1,5 +1,19 @@
 import { mount, unmount } from 'svelte'
-import { afterEach, expect, test } from 'vitest'
+import { afterEach, expect, test, vi } from 'vitest'
+vi.mock('./lib/state/app.svelte', () => ({
+  applyTheme: vi.fn(),
+  initApp: vi.fn(() => Promise.resolve()),
+  disposeApp: vi.fn(),
+  isDropInside: () => false,
+  openFromDialog: vi.fn(),
+  openPaths: vi.fn(),
+  pinRecent: vi.fn(),
+  recents: { items: [] },
+  removeRecent: vi.fn(),
+  sortRecents: () => [],
+  tabs: { active: null, tabs: [], activeId: null },
+}))
+vi.mock('./lib/native', () => ({ native: { setWindowTitle: vi.fn(), setZoom: vi.fn() } }))
 import App from './App.svelte'
 
 let mounted: ReturnType<typeof mount> | undefined
@@ -15,5 +29,5 @@ test('shows the Markdown Reader app name', () => {
   document.body.append(target)
   mounted = mount(App, { target })
 
-  expect(target.querySelector('main')?.textContent).toBe('Markdown Reader')
+  expect(target.querySelector('main')?.textContent).toContain('Markdown Reader')
 })

@@ -1,3 +1,32 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root { color-scheme: light; --reader-font: system-ui, sans-serif; --reader-size: 17px; --reader-line: 1.7; --reader-width: 75ch; }
+:root[data-theme="dark"] { color-scheme: dark; background: #111827; color: #e5e7eb; }
+html, body, #app { min-height: 100%; margin: 0; }
+body { font-family: system-ui, sans-serif; }
+.app-shell { min-height: 100vh; }
+.empty-state { box-sizing: border-box; display: grid; justify-items: center; align-content: center; min-height: 100vh; gap: 1rem; padding: 2rem; text-align: center; }
+.empty-state h1 { font-size: 1.5rem; }
+button { font: inherit; cursor: pointer; }
+.primary { padding: .65rem 1rem; border: 0; border-radius: .5rem; background: #2563eb; color: white; }
+.empty-state ul { width: min(36rem, 100%); padding: 0; list-style: none; text-align: left; }
+.empty-state li { display: flex; gap: .5rem; align-items: center; border-bottom: 1px solid #8884; padding: .45rem; }
+.recent-name, .tab-name { flex: 1; text-align: left; border: 0; background: none; color: inherit; }
+.tabbar { display: flex; overflow-x: auto; border-bottom: 1px solid #8884; }
+.tab { display: flex; align-items: center; min-width: 10rem; padding: .35rem; border-right: 1px solid #8884; }
+.tab[aria-selected="true"] { background: #8882; }
+.reader { box-sizing: border-box; width: min(var(--reader-width), 100%); max-width: 100%; height: calc(100vh - 2.5rem); min-height: calc(100vh - 2.5rem); margin: 0 auto; padding: 2rem; font-family: var(--reader-font); font-size: var(--reader-size); line-height: var(--reader-line); overflow: auto; }
+.reader .heading-anchor { opacity: 0; margin-left: .4em; text-decoration: none; }
+.reader :is(h1,h2,h3,h4,h5,h6):hover .heading-anchor { opacity: .6; }
+.reader pre { position: relative; }
+.copy-code { position: absolute; top: .5rem; right: .5rem; padding: .25rem .5rem; }
+.drop-overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #2563ebaa; color: white; font-size: 2rem; pointer-events: none; }
+.toasts { position: fixed; right: 1rem; bottom: 1rem; z-index: 20; display: grid; gap: .5rem; }
+.toasts > div { padding: .75rem 1rem; border-radius: .5rem; background: #222; color: white; }
+.toasts .error { background: #991b1b; }
+.missing { padding: 2rem; text-align: center; }
+[data-theme="dark"] .shiki, [data-theme="dark"] .shiki span { color: var(--shiki-dark) !important; background-color: var(--shiki-dark-bg) !important; }
+.markdown-alert { border-left: .25rem solid #64748b; padding: .25rem 1rem; }
+.markdown-alert-note { border-color: #3b82f6; }.markdown-alert-tip { border-color: #22c55e; }.markdown-alert-important { border-color: #a855f7; }.markdown-alert-warning { border-color: #eab308; }.markdown-alert-caution { border-color: #ef4444; }

@@ -1,14 +1,15 @@
 export interface Toast { id: number; kind: 'info' | 'error'; message: string }
 
 let nextId = 0;
+let items = $state<Toast[]>([]);
 export const toasts = {
-  items: $state<Toast[]>([]),
+  get items(): Toast[] { return items; },
   push(kind: Toast['kind'], message: string, ms = 5000): void {
     const id = ++nextId;
-    this.items.push({ id, kind, message });
+    items.push({ id, kind, message });
     if (ms > 0) globalThis.setTimeout(() => this.dismiss(id), ms);
   },
   dismiss(id: number): void {
-    this.items = this.items.filter((item) => item.id !== id);
+    items = items.filter((item) => item.id !== id);
   },
 };

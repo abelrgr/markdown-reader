@@ -11,6 +11,7 @@ for (const [source, content] of Object.entries(fixtureFiles)) {
 type E2eApi = {
   setDialogResult: (paths: string[]) => void;
   drop: (paths: string[]) => void;
+  dragOver: (inside: boolean) => void;
   emitOpenPaths: (paths: string[]) => void;
   writeFile: (path: string, content: string) => void;
   deleteFile: (path: string) => void;
@@ -42,6 +43,7 @@ function trigger(path: string, change: FileChange): void {
 const e2e: E2eApi = {
   setDialogResult(paths) { dialogResult = [...paths]; },
   drop(paths) { for (const listener of dropListeners) listener.drop(paths.filter(isMarkdownPath)); },
+  dragOver(inside) { for (const listener of dropListeners) listener.over(inside); },
   emitOpenPaths(paths) { for (const listener of openPathListeners) listener(paths); },
   writeFile(path, content) {
     const key = normalized(path);
