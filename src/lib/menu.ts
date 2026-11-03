@@ -81,6 +81,7 @@ export function buildMenuModel(recents: RecentEntry[], opts: { isMac: boolean })
           accelerator: 'CmdOrCtrl+B',
         },
         { kind: 'action', id: 'view.find', label: t('menu.find'), accelerator: 'CmdOrCtrl+F' },
+        { kind: 'action', id: 'view.focusMode', label: t('menu.focusMode'), accelerator: 'F11' },
         { kind: 'action', id: 'view.zoomIn', label: t('menu.zoomIn'), accelerator: 'CmdOrCtrl+=' },
         {
           kind: 'action',

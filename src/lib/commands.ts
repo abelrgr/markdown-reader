@@ -18,6 +18,7 @@ export type CommandId =
   | 'edit.copyAsHtml'
   | 'app.quit'
   | 'view.toggleSidebar'
+  | 'view.focusMode'
   | 'view.find'
   | 'view.zoomIn'
   | 'view.zoomOut'

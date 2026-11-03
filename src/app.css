@@ -194,6 +194,58 @@ button {
   line-height: var(--reader-line);
   overflow: auto;
 }
+.reader[data-reading-theme='github'] {
+  color: #1f2328;
+  background: #fff;
+}
+.reader[data-reading-theme='sepia'] {
+  color: #433422;
+  background: #f4ecd8;
+}
+.reader[data-reading-theme='contrast'] {
+  color: #000;
+  background: #fff;
+}
+.reader[data-reading-theme='contrast'] a {
+  color: #003db8;
+  text-decoration: underline;
+}
+.reader img {
+  cursor: zoom-in;
+}
+.image-lightbox {
+  max-width: min(96vw, 100rem);
+  max-height: 96vh;
+  padding: 2.5rem 1rem 1rem;
+  border: 0;
+  background: #111;
+}
+.image-lightbox::backdrop {
+  background: #000d;
+}
+.image-lightbox img {
+  display: block;
+  max-width: 92vw;
+  max-height: 88vh;
+  object-fit: contain;
+}
+.image-lightbox-close {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.6rem;
+  color: white;
+  background: transparent;
+  border: 0;
+  font-size: 2rem;
+}
+.focus-mode .tabbar,
+.focus-mode .sidebar,
+.focus-mode .status-bar {
+  display: none !important;
+}
+.focus-mode .reader {
+  width: min(90ch, 100%);
+}
 .reader .heading-anchor {
   opacity: 0;
   margin-left: 0.4em;

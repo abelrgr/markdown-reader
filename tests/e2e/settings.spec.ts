@@ -7,7 +7,7 @@ test('settings, theme, font size, remote images, shortcuts and About', async ({ 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: ',', ctrlKey: true, bubbles: true })),
   );
   await expect(page.getByRole('dialog')).toBeVisible();
-  await page.getByLabel('Theme').selectOption('dark');
+  await page.getByLabel('Theme', { exact: true }).selectOption('dark');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.getByLabel('Font size').fill('20');
   await expect(page.locator('article')).toHaveCSS('font-size', '20px');

@@ -34,10 +34,21 @@
   import FindBar from './components/FindBar.svelte';
   import QuickOpen from './components/QuickOpen.svelte';
   import CommandPalette from './components/CommandPalette.svelte';
+  let focusMode = $state(false);
+  function setFocusMode(active: boolean): void {
+    focusMode = active;
+    void native.setFullscreen(active);
+  }
 
   onMount(() => {
     registerAppCommands();
     const unbind = bindShortcuts(window, /Mac|iPhone|iPad/.test(navigator.platform));
+    const focus = (): void => setFocusMode(!focusMode);
+    const escape = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape' && focusMode) setFocusMode(false);
+    };
+    window.addEventListener('app:focusMode', focus);
+    window.addEventListener('keydown', escape);
     let mounted = true;
     void Promise.resolve(initApp()).catch((error: unknown) => {
       if (!mounted) return;
@@ -47,12 +58,21 @@
     return () => {
       mounted = false;
       unbind();
+      window.removeEventListener('app:focusMode', focus);
+      window.removeEventListener('keydown', escape);
       disposeApp();
     };
   });
   $effect(() => {
     const value = settings.value;
     applyTheme();
+    let style = document.getElementById('user-css') as HTMLStyleElement | null;
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'user-css';
+      document.head.append(style);
+    }
+    style.textContent = value.customCss;
     void native.setZoom(value.zoom);
   });
   $effect(() => {
@@ -90,7 +110,7 @@
   });
 </script>
 
-<div class="app-shell">
+<div class="app-shell" class:focus-mode={focusMode}>
   <FindBar />
   <QuickOpen />
   <CommandPalette />

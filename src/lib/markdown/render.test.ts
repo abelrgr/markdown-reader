@@ -17,6 +17,14 @@ describe('renderMarkdownCore', () => {
     expect(r.html).toContain('<table data-line="1">');
     expect(r.html).toContain('<td>1</td>');
   });
+  test('renders emoji shortcodes and definition lists', async () => {
+    const emoji = await renderMarkdownCore(':tada:');
+    expect(emoji.html).toContain('🎉');
+    const definitions = await renderMarkdownCore('Término\n: Definición');
+    expect(definitions.html).toContain('<dl>');
+    expect(definitions.html).toContain('<dt>Término</dt>');
+    expect(definitions.html).toContain('<dd>');
+  });
   test('renders inline math with KaTeX', async () => {
     expect((await renderMarkdownCore('$a^2$')).html).toContain('class="katex"');
   });

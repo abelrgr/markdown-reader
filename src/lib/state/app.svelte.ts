@@ -82,6 +82,7 @@ function applyTheme(): void {
       settings.value.fontFamily
     ],
   );
+  document.documentElement.dataset.readingTheme = settings.value.readingTheme;
   document.documentElement.style.setProperty('--reader-size', `${settings.value.fontSize}px`);
   document.documentElement.style.setProperty('--reader-line', String(settings.value.lineHeight));
   document.documentElement.style.setProperty(

@@ -94,6 +94,31 @@
     </select>
   </label>
   <label
+    >{t('settings.readingTheme')}
+    <select
+      aria-label={t('settings.readingTheme')}
+      value={settings.value.readingTheme}
+      onchange={(event) =>
+        settings.update({
+          readingTheme: event.currentTarget.value as typeof settings.value.readingTheme,
+        })}
+    >
+      <option value="default">{t('settings.readingDefault')}</option>
+      <option value="github">GitHub</option>
+      <option value="sepia">{t('settings.readingSepia')}</option>
+      <option value="contrast">{t('settings.readingContrast')}</option>
+    </select>
+  </label>
+  <label
+    >{t('settings.customCss')}
+    <textarea
+      aria-label={t('settings.customCss')}
+      maxlength="20000"
+      rows="5"
+      value={settings.value.customCss}
+      oninput={(event) => settings.update({ customCss: event.currentTarget.value })}></textarea>
+  </label>
+  <label
     ><input
       aria-label={t('settings.blockRemoteImages')}
       type="checkbox"

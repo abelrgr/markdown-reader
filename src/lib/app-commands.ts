@@ -21,6 +21,7 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'edit.copyAsHtml': 'menu.copyAsHtml',
   'app.quit': 'app.quit',
   'view.toggleSidebar': 'sidebar.toggle',
+  'view.focusMode': 'menu.focusMode',
   'view.find': 'menu.find',
   'view.zoomIn': 'menu.zoomIn',
   'view.zoomOut': 'menu.zoomOut',
@@ -55,6 +56,7 @@ const shortcuts: Partial<Record<CommandId, string[]>> = {
   'tabs.prev': ['Ctrl+Shift+Tab'],
   'app.settings': ['Mod+,'],
   'help.shortcuts': ['F1', 'Shift+?'],
+  'view.focusMode': ['F11'],
 };
 
 export function registerAppCommands(): void {
@@ -85,6 +87,9 @@ export function registerAppCommands(): void {
     'edit.copyAsHtml': copyAsHtml,
     'app.quit': () => native.quit(),
     'view.toggleSidebar': () => settings.update({ showSidebar: !settings.value.showSidebar }),
+    'view.focusMode': () => {
+      window.dispatchEvent(new CustomEvent('app:focusMode'));
+    },
     'view.find': () => {
       window.dispatchEvent(new CustomEvent('app:find'));
     },

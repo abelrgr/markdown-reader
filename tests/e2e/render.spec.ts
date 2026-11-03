@@ -67,7 +67,7 @@ test('renders valid Mermaid and keeps invalid diagram source visible', async ({ 
   const diagram = viewer.locator('.mermaid-block').first().locator('svg');
   const lightSvg = await diagram.evaluate((svg) => svg.outerHTML);
   await page.keyboard.press('ControlOrMeta+,');
-  await page.getByLabel('Theme').selectOption('dark');
+  await page.getByLabel('Theme', { exact: true }).selectOption('dark');
   await page.getByRole('button', { name: 'Close dialog' }).click();
   await expect.poll(() => diagram.evaluate((svg) => svg.outerHTML)).not.toBe(lightSvg);
 });

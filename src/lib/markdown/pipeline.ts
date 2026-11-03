@@ -3,6 +3,8 @@ import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkFrontmatter from 'remark-frontmatter';
+import remarkGemoji from 'remark-gemoji';
+import { remarkDefinitionList, defListHastHandlers } from 'remark-definition-list';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
@@ -29,10 +31,16 @@ export function createProcessor(
   const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkGemoji)
+    .use(remarkDefinitionList)
     .use(remarkMath)
     .use(remarkFrontmatter, ['yaml'])
     .use(remarkFrontmatterData)
-    .use(remarkRehype, { allowDangerousHtml: true, clobberPrefix: '' });
+    .use(remarkRehype, {
+      allowDangerousHtml: true,
+      clobberPrefix: '',
+      handlers: defListHastHandlers,
+    });
   if (parseRawHtml) {
     processor
       .use(rehypeRaw)

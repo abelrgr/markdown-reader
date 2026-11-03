@@ -4,10 +4,23 @@
   import { t } from '../lib/i18n/index.svelte';
   import type { Tab } from '../lib/state/tabs.svelte';
   import { enhanceViewer, handleViewerClick, tabs } from '../lib/state/app.svelte';
+  import ImageLightbox from './ImageLightbox.svelte';
+  import { settings } from '../lib/state/settings.svelte';
   let { tab }: { tab: Tab } = $props();
   let article: HTMLElement;
   let throttle: ReturnType<typeof setTimeout> | undefined;
   let themeObserver: MutationObserver | undefined;
+  let lightboxSrc = $state('');
+  let lightboxAlt = $state('');
+  function onClick(event: MouseEvent): void {
+    const target = event.target;
+    if (target instanceof HTMLImageElement && target.closest('article.reader')) {
+      lightboxSrc = target.currentSrc || target.src;
+      lightboxAlt = target.alt;
+      return;
+    }
+    void handleViewerClick(event, tab.dir);
+  }
 
   function renderDiagrams(): void {
     if (!article) return;
@@ -49,8 +62,10 @@
   bind:this={article}
   class="prose dark:prose-invert reader"
   data-testid="viewer"
-  onclick={(event) => void handleViewerClick(event, tab.dir)}
+  onclick={onClick}
+  data-reading-theme={settings.value.readingTheme}
   onscroll={saveScroll}
 >
   {@html tab.render.html}
 </article>
+<ImageLightbox bind:src={lightboxSrc} alt={lightboxAlt} />
