@@ -7,6 +7,9 @@ import {
   type NativeApi,
   type OpenedDocument,
   type Unlisten,
+  type AiConfig,
+  type AiEvent,
+  type ChatMessage,
 } from './types';
 import type { MenuModel } from '../menu';
 
@@ -44,6 +47,8 @@ type E2eApi = {
   menu?: MenuModel;
   update?: { version: string; notes: string } | null;
   updateInstallCalled?: boolean;
+  aiScript?: AiEvent[];
+  aiCancelled?: string[];
 };
 
 declare global {
@@ -61,6 +66,8 @@ const dropListeners = new Set<{
 const fileWatchers = new Map<string, Set<(change: FileChange) => void>>();
 const folderWatchers = new Map<string, Set<() => void>>();
 const knownFolders = new Set<string>();
+const cancelledAiRequests = new Set<string>();
+const fakeSecrets = new Set<string>();
 let dialogResult: string[] = [];
 let folderResult: string | null = null;
 
@@ -243,6 +250,31 @@ export const fakeNative: NativeApi = {
   async installUpdate(onProgress): Promise<void> {
     e2e.updateInstallCalled = true;
     onProgress(1);
+  },
+  async aiListModels(_config: AiConfig): Promise<string[]> {
+    return ['modelo-a', 'modelo-b'];
+  },
+  async aiChat(requestId: string, _config: AiConfig, _system: string, _messages: ChatMessage[], onEvent: (event: AiEvent) => void): Promise<void> {
+    cancelledAiRequests.delete(requestId);
+    for (const event of e2e.aiScript ?? []) {
+      if (cancelledAiRequests.has(requestId)) break;
+      onEvent(event);
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+  },
+  async aiCancel(requestId: string): Promise<void> {
+    cancelledAiRequests.add(requestId);
+    e2e.aiCancelled ??= [];
+    e2e.aiCancelled.push(requestId);
+  },
+  async secretSet(account: string, _value: string): Promise<void> {
+    fakeSecrets.add(account);
+  },
+  async secretExists(account: string): Promise<boolean> {
+    return fakeSecrets.has(account);
+  },
+  async secretDelete(account: string): Promise<void> {
+    fakeSecrets.delete(account);
   },
   async openExternal(url) {
     e2e.openedUrls.push(url);

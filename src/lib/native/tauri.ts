@@ -1,4 +1,4 @@
-import { convertFileSrc, invoke } from '@tauri-apps/api/core';
+import { Channel, convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { getVersion, getTauriVersion } from '@tauri-apps/api/app';
@@ -20,6 +20,9 @@ import {
   type SearchResults,
   type NativeApi,
   type OpenedDocument,
+  type AiConfig,
+  type AiEvent,
+  type ChatMessage,
 } from './types';
 import type { MenuItemModel, MenuModel } from '../menu';
 
@@ -207,6 +210,26 @@ export const tauriNative: NativeApi = {
     });
     pendingUpdate = undefined;
     await relaunch();
+  },
+  async aiListModels(config: AiConfig): Promise<string[]> {
+    return invoke<string[]>('ai_list_models', { config });
+  },
+  async aiChat(requestId: string, config: AiConfig, system: string, messages: ChatMessage[], onEvent: (event: AiEvent) => void): Promise<void> {
+    const channel = new Channel<AiEvent>();
+    channel.onmessage = onEvent;
+    await invoke('ai_chat', { requestId, config, system, messages, onEvent: channel });
+  },
+  async aiCancel(requestId: string): Promise<void> {
+    await invoke('ai_cancel', { requestId });
+  },
+  async secretSet(account: string, value: string): Promise<void> {
+    await invoke('secret_set', { account, value });
+  },
+  async secretExists(account: string): Promise<boolean> {
+    return invoke<boolean>('secret_exists', { account });
+  },
+  async secretDelete(account: string): Promise<void> {
+    await invoke('secret_delete', { account });
   },
   openExternal: openUrl,
   revealInFolder: revealItemInDir,

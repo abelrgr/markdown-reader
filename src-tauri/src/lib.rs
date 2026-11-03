@@ -1,7 +1,9 @@
+mod ai;
 mod documents;
 mod error;
 mod folders;
 mod search;
+mod secrets;
 mod startup;
 
 use documents::{open_document, paths_exist};
@@ -114,6 +116,7 @@ pub fn run() {
             let cwd = std::env::current_dir()?;
             let paths = collect_paths(std::env::args().skip(1), &cwd);
             app.manage(StartupPaths(Mutex::new(paths)));
+            app.manage(ai::AiRequests::default());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -124,6 +127,12 @@ pub fn run() {
             print_document,
             write_text_file,
             read_image_data_url,
+            ai::ai_list_models,
+            ai::ai_chat,
+            ai::ai_cancel,
+            secret_set,
+            secret_exists,
+            secret_delete,
             take_startup_paths
         ])
         .build(tauri::generate_context!())
@@ -145,6 +154,21 @@ pub fn run() {
             let _ = _app_handle.emit("open-paths", paths);
         }
     });
+}
+
+#[tauri::command]
+fn secret_set(account: String, value: String) -> Result<(), error::AppError> {
+    secrets::secret_set(&account, &value)
+}
+
+#[tauri::command]
+fn secret_exists(account: String) -> bool {
+    secrets::secret_exists(&account)
+}
+
+#[tauri::command]
+fn secret_delete(account: String) -> Result<(), error::AppError> {
+    secrets::secret_delete(&account)
 }
 
 #[cfg(test)]

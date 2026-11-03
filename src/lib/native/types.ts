@@ -47,6 +47,20 @@ export interface SearchResults {
   truncated: boolean;
 }
 
+export type AiProvider = 'openai-compatible' | 'anthropic';
+export interface AiConfig {
+  provider: AiProvider;
+  baseUrl: string;
+  model: string;
+  secretAccount: string | null;
+}
+export type ChatRole = 'user' | 'assistant';
+export interface ChatMessage { role: ChatRole; content: string }
+export type AiEvent =
+  | { type: 'delta'; text: string }
+  | { type: 'done'; stopReason: string | null }
+  | { type: 'error'; message: string };
+
 export type Unlisten = () => void;
 export type FileChange = 'modified' | 'removed';
 export interface KeyValueStore {
@@ -74,6 +88,12 @@ export interface NativeApi {
   printDocument(): Promise<void>;
   checkForUpdate(): Promise<{ version: string; notes: string } | null>;
   installUpdate(onProgress: (fraction: number) => void): Promise<void>;
+  aiListModels(config: AiConfig): Promise<string[]>;
+  aiChat(requestId: string, config: AiConfig, system: string, messages: ChatMessage[], onEvent: (event: AiEvent) => void): Promise<void>;
+  aiCancel(requestId: string): Promise<void>;
+  secretSet(account: string, value: string): Promise<void>;
+  secretExists(account: string): Promise<boolean>;
+  secretDelete(account: string): Promise<void>;
   openExternal(url: string): Promise<void>;
   revealInFolder(path: string): Promise<void>;
   toAssetUrl(absPath: string): string;
