@@ -15,6 +15,11 @@ Run these checks on each supported desktop OS before publishing a release. Use t
 - [x] Load the local relative image in `05-links-images-security.md`. (User-confirmed on the rebuilt local app, 2026-11-02.)
 - [ ] Check the shortcuts for opening, closing, reloading, searching, zooming, and switching tabs.
 - [ ] Close and reopen the app; verify tabs, active document, scroll position, and window size are restored.
+- [ ] Open a workspace with at least 10,000 files; confirm folder listing, quick open, and navigation stay responsive.
+- [ ] Search for text across a large folder; confirm results, previews, and opening a result at the matching location.
+- [ ] Export to PDF using the system print dialog and export standalone HTML; verify images and page layout.
+- [ ] With AI enabled, summarize a README and ask a question not answered by it; confirm it acknowledges missing information. Prefer local Ollama for the release QA run.
+- [ ] On a `2.0.0-beta.1` installation, check for updates and verify the signed `2.0.0` update can be downloaded and installed.
 
 ### Windows findings (2026-11-02)
 
@@ -29,6 +34,9 @@ Run these checks on each supported desktop OS before publishing a release. Use t
 - [ ] Verify `.md` file association, opening another file in the existing instance, and drag and drop.
 - [ ] Verify relative images in paths with spaces and accents.
 - [ ] Verify dark theme, shortcuts, external-editor reload, and restored tabs/window state.
+- [ ] Open a workspace with 10,000+ files and run folder search.
+- [ ] Export a document to PDF via the system print dialog.
+- [ ] Verify AI with local Ollama: summarize a README and ask about information absent from it.
 
 ## Linux
 
@@ -36,6 +44,13 @@ Run these checks on each supported desktop OS before publishing a release. Use t
 - [ ] Verify `.md` file association, opening another file in the existing instance, and drag and drop.
 - [ ] Verify relative images in paths with spaces and accents.
 - [ ] Verify dark theme, shortcuts, external-editor reload, and restored tabs/window state.
+- [ ] Open a workspace with 10,000+ files and run folder search.
+- [ ] Export a document to PDF via the system print dialog.
+- [ ] Verify AI with local Ollama: summarize a README and ask about information absent from it.
+
+## Upgrade QA
+
+- [ ] Upgrade from `2.0.0-beta.1` to `2.0.0` using the signed automatic updater and verify open documents/settings remain usable.
 
 ## Automated verification
 

@@ -15,7 +15,11 @@ Markdown Reader is a secure, cross-platform Markdown reader built with Tauri 2, 
 - `src/lib/native/` — typed boundary to native APIs
 - `src/lib/markdown/` — safe Markdown rendering pipeline
 - `src/lib/state/` — tabs, settings, recents and session
+- `src/lib/ai/` — provider presets, context selection, prompts and per-tab AI chat session
 - `src/components/` — Svelte UI components
+- `src-tauri/src/ai/` — provider streaming (OpenAI-compatible and Anthropic) and AI request lifecycle
+- `src-tauri/src/search.rs` — full-text search across Markdown documents in a folder
+- `src-tauri/src/folders.rs` — `.gitignore`-aware Markdown folder listing and workspace operations
 - `src-tauri/` — Rust backend and Tauri configuration
 - `tests/e2e/` — Playwright tests and fixtures
 - `docs/superpowers/plans/` — implementation plans
