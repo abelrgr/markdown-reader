@@ -55,6 +55,7 @@ pub fn search_markdown(
         .git_global(false)
         .git_exclude(true)
         .require_git(false)
+        .sort_by_file_name(|left, right| left.cmp(right))
         .build()
     {
         let entry = match result {
