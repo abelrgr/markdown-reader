@@ -62,7 +62,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "untrusted comment: minisign public key: C1E64D9E1D3AEA7D\nRWR96jodnk3mwaGXlfHusxeYk/9zoptHNPot5WOHZPqHcL6F/HdGfg4W\n",
+      "pubkey": "RWR96jodnk3mwaGXlfHusxeYk/9zoptHNPot5WOHZPqHcL6F/HdGfg4W",
       "endpoints": [
         "https://github.com/abelrgr/markdown-reader/releases/latest/download/latest.json"
       ]
