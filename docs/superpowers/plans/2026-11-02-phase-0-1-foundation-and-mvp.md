@@ -1139,15 +1139,15 @@ export function clearFindHighlights(): void;
 - Modify: `README.md`, `CLAUDE.md`, `package.json` (version), `readme_assets/` (new screenshot)
 - Create: `docs/QA-CHECKLIST.md`
 
-- [ ] **Step 1: New README** (English): description, screenshot, Phase 1 features, download (Releases), development (requirements: Node 24, Rust, Tauri system dependencies with a link to https://v2.tauri.app/start/prerequisites/; commands `npm ci`, `npm run tauri dev`, `npm test`, `npm run e2e`), folder structure, link to `legacy/`, license.
-- [ ] **Step 2: `docs/QA-CHECKLIST.md`**: manual checklist for Windows, macOS and Linux: install the package; double-clicking a `.md` opens the app; with the app open, double-clicking another `.md` adds a tab; drag and drop; relative images in a path with spaces and accents; UTF-16 file from Notepad; dark theme; reload when saving from another editor; shortcuts; closing and reopening restores the session and window size.
-- [ ] **Step 3: Full verification**
+- [x] **Step 1: New README** (English): includes the app description, screenshot, feature list, Releases link, development requirements and commands, project structure, `legacy/` reference, and license. Updated for 2.0.0 in Task 13.
+- [x] **Step 2: `docs/QA-CHECKLIST.md`**: includes the requested Windows/macOS/Linux manual checks; updated with Phase 2 release checks in Task 13.
+- [x] **Step 3: Full verification**
 
 Run: `npm run check && npm test && npm run e2e && cargo test --manifest-path src-tauri/Cargo.toml && cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings && npm run tauri build`
-Expected: everything PASSES and there is an installer in `src-tauri/target/release/bundle/`.
+Expected: everything PASSES and there is an installer in `src-tauri/target/release/bundle/`. Verified by successful CI run `41700246911` on commit `8255df6`, including signed Windows Tauri bundles; local `npm run check` and `npm run build` also pass at version `2.0.0`.
 
-- [ ] **Step 4: Run the manual QA at least on Windows** and record the results in the phase report.
-- [ ] **Step 5: Commit and tag (local)**
+- [ ] **Step 4: Run the manual QA at least on Windows** and record the results in the phase report. Partial user-confirmed Windows results are recorded in `docs/QA-CHECKLIST.md`; outstanding checks remain unchecked there and must be run before calling this gate complete.
+- [x] **Step 5: Commit and tag (local)** — Phase 1 documentation/version commit and `v2.0.0-beta.1` tag are present locally; the final `2.0.0` release commit/tag are recorded in the Phase 2 plan. No release tag has been pushed.
 
 ```bash
 git add -A
