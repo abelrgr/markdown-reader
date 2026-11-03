@@ -22,6 +22,8 @@ export async function renderMarkdownCore(source: string): Promise<RenderResult> 
     hasCodeFence ? await getHighlighter() : null,
     source.includes('<'),
     hasAlerts,
+    /\$|\\\(|\\\[/.test(source),
+    /```mermaid\b|~~~mermaid\b/i.test(source),
   );
   const mdast = processor.parse(source) as MdastRoot;
   if (hasCodeFence) {

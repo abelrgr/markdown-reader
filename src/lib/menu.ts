@@ -36,6 +36,13 @@ export function buildMenuModel(recents: RecentEntry[], opts: { isMac: boolean })
       label: t('menu.openFolder'),
       accelerator: 'CmdOrCtrl+Shift+O',
     },
+    {
+      kind: 'action',
+      id: 'file.exportHtml',
+      label: t('menu.exportHtml'),
+      accelerator: 'CmdOrCtrl+Shift+E',
+    },
+    { kind: 'action', id: 'file.print', label: t('menu.print'), accelerator: 'CmdOrCtrl+Alt+P' },
     recentMenu,
     { kind: 'action', id: 'file.reload', label: t('menu.reload'), accelerator: 'CmdOrCtrl+R' },
     { kind: 'action', id: 'file.closeTab', label: t('menu.closeTab'), accelerator: 'CmdOrCtrl+W' },
@@ -55,6 +62,12 @@ export function buildMenuModel(recents: RecentEntry[], opts: { isMac: boolean })
       label: t('menu.edit'),
       items: [
         { kind: 'predefined', item: 'copy' },
+        {
+          kind: 'action',
+          id: 'edit.copyAsHtml',
+          label: t('menu.copyAsHtml'),
+          accelerator: 'CmdOrCtrl+Shift+C',
+        },
         { kind: 'predefined', item: 'selectAll' },
       ],
     },

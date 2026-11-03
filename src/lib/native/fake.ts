@@ -36,6 +36,9 @@ type E2eApi = {
   openedUrls: string[];
   openPathsReady: boolean;
   searchDelayMs?: Record<string, number>;
+  savedFiles?: Record<string, string>;
+  printRequested?: boolean;
+  saveResult?: string | null;
   zoom?: number;
   fullscreen?: boolean;
   menu?: MenuModel;
@@ -104,6 +107,9 @@ const e2e: E2eApi = {
   openedUrls: [],
   openPathsReady: false,
   searchDelayMs: {},
+  savedFiles: {},
+  printRequested: false,
+  saveResult: null,
 };
 if (typeof window !== 'undefined') window.__e2e = e2e;
 
@@ -216,6 +222,18 @@ export const fakeNative: NativeApi = {
       }
     }
     return { hits: hits.slice(0, 500), truncated: hits.length > 500 };
+  },
+  async saveFileDialog(): Promise<string | null> {
+    const path = e2e.saveResult ?? null;
+    e2e.saveResult = null;
+    return path;
+  },
+  async writeTextFile(path, content): Promise<void> {
+    e2e.savedFiles ??= {};
+    e2e.savedFiles[path] = content;
+  },
+  async printDocument(): Promise<void> {
+    e2e.printRequested = true;
   },
   async openExternal(url) {
     e2e.openedUrls.push(url);

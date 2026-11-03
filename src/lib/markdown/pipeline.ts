@@ -23,6 +23,8 @@ export function createProcessor(
   highlighter: HighlighterCore | null,
   parseRawHtml = true,
   processAlerts = true,
+  processMath = true,
+  processMermaid = true,
 ) {
   const processor = unified()
     .use(remarkParse)
@@ -37,11 +39,13 @@ export function createProcessor(
       .use(rehypeSanitize, { ...defaultSchema, clobberPrefix: 'user-content-' })
       .use(rehypeFixClobberedFragments);
   } else processor.use(rehypeSafeMarkdownUrls);
-  // rehype-katex handles invalid formulas as `.katex-error` internally (throwOnError: false).
-  processor.use(rehypeKatex, { strict: 'ignore' });
+  if (processMath) {
+    // rehype-katex handles invalid formulas as `.katex-error` internally (throwOnError: false).
+    processor.use(rehypeKatex, { strict: 'ignore' });
+  }
   if (processAlerts) processor.use(rehypeAlerts);
   processor.use(rehypeHeadings);
-  processor.use(rehypeMermaidBlocks);
+  if (processMermaid) processor.use(rehypeMermaidBlocks);
   processor.use(rehypeSourceLines);
   if (highlighter) {
     processor.use(() =>

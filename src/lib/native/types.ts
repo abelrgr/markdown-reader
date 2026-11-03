@@ -69,6 +69,9 @@ export interface NativeApi {
   watchFile(path: string, onChange: (change: FileChange) => void): Promise<Unlisten>;
   watchFolder(root: string, onChange: () => void): Promise<Unlisten>;
   searchFolder(root: string, query: string, caseSensitive: boolean): Promise<SearchResults>;
+  saveFileDialog(defaultName: string, ext: 'html'): Promise<string | null>;
+  writeTextFile(path: string, content: string): Promise<void>;
+  printDocument(): Promise<void>;
   openExternal(url: string): Promise<void>;
   revealInFolder(path: string): Promise<void>;
   toAssetUrl(absPath: string): string;

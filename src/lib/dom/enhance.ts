@@ -9,7 +9,9 @@ export function resolveLocalImages(
   for (const image of root.querySelectorAll('img')) {
     const localSrc = image.getAttribute('data-local-src');
     if (localSrc !== null) {
-      image.setAttribute('src', toAssetUrl(joinPath(docDir, localSrc)));
+      const path = joinPath(docDir, localSrc);
+      image.setAttribute('data-local-path', path);
+      image.setAttribute('src', toAssetUrl(path));
       image.removeAttribute('data-local-src');
       continue;
     }

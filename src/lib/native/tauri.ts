@@ -3,13 +3,14 @@ import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { getVersion, getTauriVersion } from '@tauri-apps/api/app';
 import { listen } from '@tauri-apps/api/event';
-import { open } from '@tauri-apps/plugin-dialog';
+import { open, save } from '@tauri-apps/plugin-dialog';
 import { watch } from '@tauri-apps/plugin-fs';
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { load } from '@tauri-apps/plugin-store';
 import { Menu } from '@tauri-apps/api/menu';
 import { dirname, isMarkdownPath, MARKDOWN_EXTENSIONS } from '../fs/paths';
 import { isEventForFile } from './watch-filter';
+import { inlineImages } from '../export';
 import {
   NativeError,
   type AppErrorCode,
@@ -131,6 +132,55 @@ export const tauriNative: NativeApi = {
   async searchFolder(root, query, caseSensitive): Promise<SearchResults> {
     try {
       return await invoke<SearchResults>('search_folder', { root, query, caseSensitive });
+    } catch (error) {
+      throw parseError(error);
+    }
+  },
+  async saveFileDialog(defaultName, ext): Promise<string | null> {
+    return save({
+      defaultPath: defaultName,
+      filters: [{ name: ext.toUpperCase(), extensions: [ext] }],
+    });
+  },
+  async writeTextFile(path, content): Promise<void> {
+    try {
+      await invoke('write_text_file', { path, content });
+    } catch (error) {
+      throw parseError(error);
+    }
+  },
+  async printDocument(): Promise<void> {
+    const article = document.querySelector<HTMLElement>('article.reader');
+    if (article) {
+      await Promise.all(
+        Array.from(article.querySelectorAll<HTMLImageElement>('img[data-local-path]')).map(
+          async (image) => {
+            try {
+              image.src = await invoke<string>('read_image_data_url', {
+                path: image.dataset.localPath,
+              });
+            } catch {
+              // A local image failure should not prevent printing the rest of the document.
+            }
+          },
+        ),
+      );
+      await inlineImages(article);
+    }
+    await document.fonts.ready;
+    await Promise.all(
+      Array.from(document.images).map(async (image) => {
+        image.loading = 'eager';
+        if (image.complete && image.naturalWidth > 0) return;
+        try {
+          await image.decode();
+        } catch {
+          // A broken image should not prevent printing the rest of the document.
+        }
+      }),
+    );
+    try {
+      await invoke('print_document');
     } catch (error) {
       throw parseError(error);
     }

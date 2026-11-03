@@ -4,6 +4,8 @@ import type { MessageKey } from './i18n/en';
 import { openFolderFromDialog, openFromDialog, recents, tabs } from './state/app.svelte';
 import { settings } from './state/settings.svelte';
 import { registerCommands, type Command, type CommandId } from './commands';
+import { buildStandaloneHtml, collectCss, inlineImages } from './export';
+import { getLocale } from './i18n/index.svelte';
 
 const titles: Partial<Record<CommandId, MessageKey>> = {
   'file.open': 'menu.open',
@@ -14,6 +16,9 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'nav.quickOpen': 'menu.quickOpen',
   'nav.commandPalette': 'menu.commandPalette',
   'nav.searchFolder': 'menu.searchFolder',
+  'file.exportHtml': 'menu.exportHtml',
+  'file.print': 'menu.print',
+  'edit.copyAsHtml': 'menu.copyAsHtml',
   'app.quit': 'app.quit',
   'view.toggleSidebar': 'sidebar.toggle',
   'view.find': 'menu.find',
@@ -35,6 +40,9 @@ const shortcuts: Partial<Record<CommandId, string[]>> = {
   'nav.quickOpen': ['Mod+P'],
   'nav.commandPalette': ['Mod+Shift+P'],
   'nav.searchFolder': ['Mod+Shift+F'],
+  'file.exportHtml': ['Mod+Shift+E'],
+  'file.print': ['Mod+Alt+P'],
+  'edit.copyAsHtml': ['Mod+Shift+C'],
   'file.closeTab': ['Mod+W'],
   'file.reload': ['Mod+R', 'F5'],
   'app.quit': ['Mod+Q'],
@@ -72,6 +80,9 @@ export function registerAppCommands(): void {
     'nav.searchFolder': () => {
       window.dispatchEvent(new CustomEvent('app:searchFolder'));
     },
+    'file.exportHtml': exportHtml,
+    'file.print': () => native.printDocument(),
+    'edit.copyAsHtml': copyAsHtml,
     'app.quit': () => native.quit(),
     'view.toggleSidebar': () => settings.update({ showSidebar: !settings.value.showSidebar }),
     'view.find': () => {
@@ -104,6 +115,46 @@ export function registerAppCommands(): void {
     })),
   );
   registerCommands(commands);
+}
+
+async function currentHtml(): Promise<string | null> {
+  const tab = tabs.active;
+  const article = document.querySelector<HTMLElement>('[data-testid="viewer"]');
+  if (!tab || !article) return null;
+  const clone = article.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll('button.copy-code').forEach((button) => button.remove());
+  clone
+    .querySelectorAll('[data-local-path]')
+    .forEach((image) => image.removeAttribute('data-local-path'));
+  await inlineImages(clone);
+  return buildStandaloneHtml({
+    title: tab.name,
+    bodyHtml: clone.innerHTML,
+    css: collectCss(document),
+    lang: getLocale(),
+  });
+}
+
+async function exportHtml(): Promise<void> {
+  const tab = tabs.active;
+  const html = await currentHtml();
+  if (!tab || !html) return;
+  const path = await native.saveFileDialog(`${tab.name.replace(/\.[^.]+$/, '')}.html`, 'html');
+  if (path) await native.writeTextFile(path, html);
+}
+
+async function copyAsHtml(): Promise<void> {
+  const tab = tabs.active;
+  const html = await currentHtml();
+  if (!tab || !html) return;
+  const article = document.querySelector<HTMLElement>('[data-testid="viewer"]');
+  const plain = article?.innerText ?? '';
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([plain], { type: 'text/plain' }),
+    }),
+  ]);
 }
 function setZoom(value: number): void {
   const zoom = Math.max(0.5, Math.min(2, Math.round(value * 10) / 10));

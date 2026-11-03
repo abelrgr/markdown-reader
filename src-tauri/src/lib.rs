@@ -12,6 +12,67 @@ use std::path::Path;
 use std::sync::Mutex;
 use tauri::{Emitter, Manager};
 
+const MAX_PRINT_IMAGE_BYTES: u64 = 12 * 1024 * 1024;
+
+fn print_image_mime(path: &std::path::Path) -> Option<&'static str> {
+    match path.extension()?.to_str()?.to_ascii_lowercase().as_str() {
+        "png" => Some("image/png"),
+        "jpg" | "jpeg" => Some("image/jpeg"),
+        "gif" => Some("image/gif"),
+        "webp" => Some("image/webp"),
+        "bmp" => Some("image/bmp"),
+        "avif" => Some("image/avif"),
+        _ => None,
+    }
+}
+
+#[tauri::command]
+fn read_image_data_url(app: tauri::AppHandle, path: String) -> Result<String, error::AppError> {
+    let path = dunce::canonicalize(path).map_err(error::AppError::from)?;
+    if !app.asset_protocol_scope().is_allowed(&path) {
+        return Err(error::AppError::Io(
+            "Image path is outside the authorized document scope".into(),
+        ));
+    }
+    let mime = print_image_mime(&path)
+        .ok_or_else(|| error::AppError::Io("Unsupported image type for printing".into()))?;
+    let metadata = std::fs::metadata(&path).map_err(error::AppError::from)?;
+    if !metadata.is_file() || metadata.len() > MAX_PRINT_IMAGE_BYTES {
+        return Err(error::AppError::Io(
+            "Image is not a regular file or exceeds the print size limit".into(),
+        ));
+    }
+    let bytes = std::fs::read(path).map_err(error::AppError::from)?;
+    use base64::Engine;
+    Ok(format!(
+        "data:{mime};base64,{}",
+        base64::engine::general_purpose::STANDARD.encode(bytes)
+    ))
+}
+
+#[tauri::command]
+fn write_text_file(path: String, content: String) -> Result<(), error::AppError> {
+    if !std::path::Path::new(&path)
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| extension.eq_ignore_ascii_case("html"))
+    {
+        return Err(error::AppError::Io(
+            "Only .html files can be written by this command".into(),
+        ));
+    }
+    std::fs::write(path, content).map_err(error::AppError::from)
+}
+
+#[tauri::command]
+fn print_document(webview: tauri::Webview) -> Result<(), error::AppError> {
+    #[cfg(target_os = "macos")]
+    let result = webview.print();
+    #[cfg(not(target_os = "macos"))]
+    let result = webview.eval("window.print()");
+    result.map_err(|error| error::AppError::Io(error.to_string()))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(desktop)]
@@ -58,6 +119,9 @@ pub fn run() {
             paths_exist,
             open_folder,
             search_folder,
+            print_document,
+            write_text_file,
+            read_image_data_url,
             take_startup_paths
         ])
         .build(tauri::generate_context!())
@@ -79,4 +143,25 @@ pub fn run() {
             let _ = _app_handle.emit("open-paths", paths);
         }
     });
+}
+
+#[cfg(test)]
+mod print_image_tests {
+    use super::print_image_mime;
+    use std::path::Path;
+
+    #[test]
+    fn limits_print_inline_mime_types_to_raster_images() {
+        assert_eq!(print_image_mime(Path::new("image.png")), Some("image/png"));
+        assert_eq!(
+            print_image_mime(Path::new("image.JPEG")),
+            Some("image/jpeg")
+        );
+        assert_eq!(
+            print_image_mime(Path::new("image.webp")),
+            Some("image/webp")
+        );
+        assert_eq!(print_image_mime(Path::new("document.svg")), None);
+        assert_eq!(print_image_mime(Path::new("secret.txt")), None);
+    }
 }
