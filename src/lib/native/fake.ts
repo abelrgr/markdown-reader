@@ -49,6 +49,8 @@ type E2eApi = {
   updateInstallCalled?: boolean;
   aiScript?: AiEvent[];
   aiCancelled?: string[];
+  aiCalls?: number;
+  aiRequests?: ChatMessage[][];
 };
 
 declare global {
@@ -254,7 +256,16 @@ export const fakeNative: NativeApi = {
   async aiListModels(_config: AiConfig): Promise<string[]> {
     return ['modelo-a', 'modelo-b'];
   },
-  async aiChat(requestId: string, _config: AiConfig, _system: string, _messages: ChatMessage[], onEvent: (event: AiEvent) => void): Promise<void> {
+  async aiChat(
+    requestId: string,
+    _config: AiConfig,
+    _system: string,
+    _messages: ChatMessage[],
+    onEvent: (event: AiEvent) => void,
+  ): Promise<void> {
+    e2e.aiCalls = (e2e.aiCalls ?? 0) + 1;
+    e2e.aiRequests ??= [];
+    e2e.aiRequests.push(_messages.map((message) => ({ ...message })));
     cancelledAiRequests.delete(requestId);
     for (const event of e2e.aiScript ?? []) {
       if (cancelledAiRequests.has(requestId)) break;

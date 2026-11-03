@@ -7,6 +7,7 @@ export async function openApp(page: Page, opts: { startup?: string[] } = {}): Pr
     sessionStorage.setItem('__e2e-startup-consumed', 'true');
   }, opts.startup ?? []);
   await page.goto('/');
+  await page.waitForFunction(() => window.__e2e?.openPathsReady === true);
 }
 
 export async function openViaDialog(page: Page, paths: string[]): Promise<void> {

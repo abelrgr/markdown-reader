@@ -4,8 +4,15 @@ import type { RenderResult } from '../markdown/types';
 
 export type TabStatus = 'ready' | 'missing';
 export interface Tab {
-  id: string; path: string; name: string; dir: string; content: string; render: RenderResult;
-  scrollTop: number; status: TabStatus; encoding: string;
+  id: string;
+  path: string;
+  name: string;
+  dir: string;
+  content: string;
+  render: RenderResult;
+  scrollTop: number;
+  status: TabStatus;
+  encoding: string;
 }
 export interface TabsDeps {
   openDocument: (path: string) => Promise<OpenedDocument>;
@@ -25,7 +32,9 @@ export class TabsState {
   }
 
   async open(path: string, opts: { scrollTop?: number; activate?: boolean } = {}): Promise<Tab> {
-    const existing = this.tabs.find((tab) => samePath(tab.path, path, this.deps.caseInsensitive ?? IS_WINDOWS));
+    const existing = this.tabs.find((tab) =>
+      samePath(tab.path, path, this.deps.caseInsensitive ?? IS_WINDOWS),
+    );
     if (existing) {
       if (opts.activate !== false) this.activeId = existing.id;
       return existing;
@@ -49,11 +58,34 @@ export class TabsState {
     }
   }
 
+  async openVirtual(name: string, content: string): Promise<Tab> {
+    const rendered = await this.deps.render(content);
+    const path = `virtual:${crypto.randomUUID()}`;
+    const tab: Tab = {
+      id: crypto.randomUUID(),
+      path,
+      name,
+      dir: '',
+      content,
+      render: rendered,
+      scrollTop: 0,
+      status: 'ready',
+      encoding: 'UTF-8',
+    };
+    this.tabs = [...this.tabs, tab];
+    this.activeId = tab.id;
+    return tab;
+  }
+
   private async openNew(path: string, scrollTop: number): Promise<Tab> {
     const document = await this.deps.openDocument(path);
     const rendered = await this.deps.render(document.content);
     const tab: Tab = {
-      id: crypto.randomUUID(), ...document, render: rendered, scrollTop: Math.max(0, scrollTop), status: 'ready',
+      id: crypto.randomUUID(),
+      ...document,
+      render: rendered,
+      scrollTop: Math.max(0, scrollTop),
+      status: 'ready',
     };
     this.tabs = [...this.tabs, tab];
     return tab;
@@ -73,15 +105,26 @@ export class TabsState {
   }
 
   move(fromIndex: number, toIndex: number): void {
-    if (fromIndex < 0 || fromIndex >= this.tabs.length || toIndex < 0 || toIndex >= this.tabs.length || fromIndex === toIndex) return;
+    if (
+      fromIndex < 0 ||
+      fromIndex >= this.tabs.length ||
+      toIndex < 0 ||
+      toIndex >= this.tabs.length ||
+      fromIndex === toIndex
+    )
+      return;
     const next = [...this.tabs];
     const [tab] = next.splice(fromIndex, 1);
     if (tab) next.splice(toIndex, 0, tab);
     this.tabs = next;
   }
 
-  next(): void { this.cycle(1); }
-  prev(): void { this.cycle(-1); }
+  next(): void {
+    this.cycle(1);
+  }
+  prev(): void {
+    this.cycle(-1);
+  }
 
   private cycle(direction: 1 | -1): void {
     if (this.tabs.length === 0) return;
@@ -99,7 +142,10 @@ export class TabsState {
       const rendered = await this.deps.render(document.content);
       Object.assign(tab, document, { render: rendered, scrollTop, status: 'ready' as const });
     } catch (error: unknown) {
-      if (error instanceof NativeError || (typeof error === 'object' && error !== null && 'code' in error)) {
+      if (
+        error instanceof NativeError ||
+        (typeof error === 'object' && error !== null && 'code' in error)
+      ) {
         if (error.code !== 'NOT_FOUND') throw error;
         tab.status = 'missing';
         return;

@@ -34,7 +34,11 @@ export type CommandId =
   | 'app.settings'
   | 'help.shortcuts'
   | 'help.checkUpdates'
-  | 'help.about';
+  | 'help.about'
+  | 'ai.togglePanel'
+  | 'ai.summarize'
+  | 'ai.translate'
+  | 'ai.explainSelection';
 
 let commands: Command[] = [];
 export function registerCommands(cmds: Command[]): void {

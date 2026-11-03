@@ -2,6 +2,10 @@ import type { MessageKey } from './en';
 
 export const es: Record<MessageKey, string> = {
   'app.name': 'Markdown Reader',
+  'ai.toggle': 'Mostrar/ocultar asistente de IA',
+  'ai.summarize': 'Resumir documento',
+  'ai.translate': 'Traducir documento',
+  'ai.explain': 'Explicar selección con IA',
   'app.openFile': 'Abrir archivo…',
   'app.openFolder': 'Abrir carpeta…',
   'app.dropFile': 'Suelta un archivo aquí',

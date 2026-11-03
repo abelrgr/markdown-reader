@@ -34,6 +34,8 @@
   import FindBar from './components/FindBar.svelte';
   import QuickOpen from './components/QuickOpen.svelte';
   import CommandPalette from './components/CommandPalette.svelte';
+  import AiPanel from './components/AiPanel.svelte';
+  import SelectionActions from './components/SelectionActions.svelte';
   let focusMode = $state(false);
   function setFocusMode(active: boolean): void {
     focusMode = active;
@@ -95,13 +97,20 @@
     void native.setWindowTitle(active ? `${active.name} — ${t('app.name')}` : t('app.name'));
   });
   $effect(() => {
-    if (appStatus.ready) syncFileWatchers(tabs.tabs.map(({ id, path }) => ({ id, path })));
+    if (appStatus.ready)
+      syncFileWatchers(
+        tabs.tabs
+          .filter(({ path }) => !path.startsWith('virtual:'))
+          .map(({ id, path }) => ({ id, path })),
+      );
   });
   $effect(() => {
     if (!appStatus.ready) return;
     const snapshot = {
-      tabs: tabs.tabs.map(({ path, scrollTop }) => ({ path, scrollTop })),
-      activePath: tabs.active?.path ?? null,
+      tabs: tabs.tabs
+        .filter(({ path }) => !path.startsWith('virtual:'))
+        .map(({ path, scrollTop }) => ({ path, scrollTop })),
+      activePath: tabs.active?.path.startsWith('virtual:') ? null : (tabs.active?.path ?? null),
     };
     const timer = setTimeout(() => {
       void native.store.set('session', snapshot);
@@ -134,6 +143,8 @@
   <FindBar />
   <QuickOpen />
   <CommandPalette />
+  <AiPanel />
+  <SelectionActions />
   {#if tabs.active}
     <TabBar />
     <div class="workspace">

@@ -3,13 +3,29 @@ import { NativeError, type OpenedDocument } from '../native/types';
 import type { RenderResult } from '../markdown/types';
 import { TabsState } from './tabs.svelte';
 
-const renderResult: RenderResult = { html: '', toc: [], frontmatter: null, stats: { words: 0, readingMinutes: 1 } };
+const renderResult: RenderResult = {
+  html: '',
+  toc: [],
+  frontmatter: null,
+  stats: { words: 0, readingMinutes: 1 },
+};
 function doc(path: string): OpenedDocument {
-  return { path, name: path.split('/').at(-1) ?? path, dir: 'C:/a', content: '# x', modifiedMs: 1, encoding: 'utf-8' };
+  return {
+    path,
+    name: path.split('/').at(-1) ?? path,
+    dir: 'C:/a',
+    content: '# x',
+    modifiedMs: 1,
+    encoding: 'utf-8',
+  };
 }
 function fixture() {
   const openDocument = vi.fn(async (path: string) => doc(path));
-  const tabs = new TabsState({ openDocument, render: async () => renderResult, caseInsensitive: true });
+  const tabs = new TabsState({
+    openDocument,
+    render: async () => renderResult,
+    caseInsensitive: true,
+  });
   return { tabs, openDocument };
 }
 
@@ -38,9 +54,16 @@ describe('TabsState', () => {
   it('coalesces concurrent opens of the same path', async () => {
     let resolveDocument!: (document: OpenedDocument) => void;
     const openDocument = vi.fn(
-      () => new Promise<OpenedDocument>((resolve) => { resolveDocument = resolve; }),
+      () =>
+        new Promise<OpenedDocument>((resolve) => {
+          resolveDocument = resolve;
+        }),
     );
-    const tabs = new TabsState({ openDocument, render: async () => renderResult, caseInsensitive: true });
+    const tabs = new TabsState({
+      openDocument,
+      render: async () => renderResult,
+      caseInsensitive: true,
+    });
     const first = tabs.open('C:/A/b.md');
     const second = tabs.open('c:/a/B.md');
     resolveDocument(doc('C:/A/b.md'));
@@ -49,6 +72,15 @@ describe('TabsState', () => {
     expect(firstTab).toBe(secondTab);
     expect(tabs.tabs).toHaveLength(1);
     expect(openDocument).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens virtual documents without reading a filesystem path', async () => {
+    const { tabs, openDocument } = fixture();
+    const tab = await tabs.openVirtual('translation.md', '# translated');
+    expect(tab.path).toMatch(/^virtual:/);
+    expect(tab.content).toBe('# translated');
+    expect(tabs.active?.id).toBe(tab.id);
+    expect(openDocument).not.toHaveBeenCalled();
   });
 
   it('preserves scroll on reload and keeps a tab marked missing on NOT_FOUND', async () => {

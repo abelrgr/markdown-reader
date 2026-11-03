@@ -1,5 +1,9 @@
 export const en = {
   'app.name': 'Markdown Reader',
+  'ai.toggle': 'Toggle AI assistant',
+  'ai.summarize': 'Summarize document',
+  'ai.translate': 'Translate document',
+  'ai.explain': 'Explain selection with AI',
   'app.openFile': 'Open file…',
   'app.openFolder': 'Open folder…',
   'app.dropFile': 'Drop a file here',

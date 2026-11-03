@@ -12,6 +12,13 @@ export interface Settings {
   readingTheme: 'default' | 'github' | 'sepia' | 'contrast';
   customCss: string;
   autoCheckUpdates: boolean;
+  ai: {
+    enabled: boolean;
+    presetId: 'ollama' | 'lmstudio' | 'llamacpp' | 'openai' | 'anthropic' | 'custom';
+    baseUrl: string;
+    model: string;
+    approvedHosts: string[];
+  };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -28,6 +35,13 @@ export const DEFAULT_SETTINGS: Settings = {
   readingTheme: 'default',
   customCss: '',
   autoCheckUpdates: true,
+  ai: {
+    enabled: false,
+    presetId: 'ollama',
+    baseUrl: 'http://localhost:11434/v1',
+    model: '',
+    approvedHosts: [],
+  },
 };
 
 function record(value: unknown): Record<string, unknown> {
@@ -77,5 +91,25 @@ export function normalizeSettings(raw: unknown): Settings {
     ),
     customCss: typeof input.customCss === 'string' ? input.customCss.slice(0, 20_000) : '',
     autoCheckUpdates: typeof input.autoCheckUpdates === 'boolean' ? input.autoCheckUpdates : true,
+    ai: (() => {
+      const ai = record(input.ai);
+      const presetId = enumValue(
+        ai.presetId,
+        ['ollama', 'lmstudio', 'llamacpp', 'openai', 'anthropic', 'custom'] as const,
+        'ollama',
+      );
+      return {
+        enabled: typeof ai.enabled === 'boolean' ? ai.enabled : false,
+        presetId,
+        baseUrl:
+          typeof ai.baseUrl === 'string' ? ai.baseUrl.slice(0, 2048) : 'http://localhost:11434/v1',
+        model: typeof ai.model === 'string' ? ai.model.slice(0, 256) : '',
+        approvedHosts: Array.isArray(ai.approvedHosts)
+          ? ai.approvedHosts
+              .filter((host): host is string => typeof host === 'string')
+              .slice(0, 100)
+          : [],
+      };
+    })(),
   };
 }

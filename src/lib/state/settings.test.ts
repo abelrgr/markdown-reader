@@ -19,4 +19,11 @@ describe('normalizeSettings', () => {
     expect(normalizeSettings(undefined).autoCheckUpdates).toBe(true);
     expect(normalizeSettings({ autoCheckUpdates: false }).autoCheckUpdates).toBe(false);
   });
+  it('keeps AI optional and validates stored provider settings', () => {
+    expect(normalizeSettings(undefined).ai).toMatchObject({ enabled: false, presetId: 'ollama' });
+    expect(
+      normalizeSettings({ ai: { enabled: true, presetId: 'invalid', approvedHosts: ['ok', 1] } })
+        .ai,
+    ).toMatchObject({ enabled: true, presetId: 'ollama', approvedHosts: ['ok'] });
+  });
 });

@@ -47,6 +47,10 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'help.shortcuts': 'menu.shortcuts',
   'help.checkUpdates': 'menu.checkUpdates',
   'help.about': 'menu.about',
+  'ai.togglePanel': 'ai.toggle',
+  'ai.summarize': 'ai.summarize',
+  'ai.translate': 'ai.translate',
+  'ai.explainSelection': 'ai.explain',
 };
 const shortcuts: Partial<Record<CommandId, string[]>> = {
   'file.open': ['Mod+O'],
@@ -73,6 +77,7 @@ const shortcuts: Partial<Record<CommandId, string[]>> = {
   'app.settings': ['Mod+,'],
   'help.shortcuts': ['F1', 'Shift+?'],
   'view.focusMode': ['F11'],
+  'ai.togglePanel': ['Mod+Shift+A'],
 };
 
 export function registerAppCommands(): void {
@@ -129,6 +134,20 @@ export function registerAppCommands(): void {
     'help.checkUpdates': checkForUpdates,
     'help.about': () => {
       window.dispatchEvent(new CustomEvent('app:about'));
+    },
+    'ai.togglePanel': () => {
+      window.dispatchEvent(new CustomEvent('app:aiToggle'));
+    },
+    'ai.summarize': () => {
+      window.dispatchEvent(new CustomEvent('app:aiToggle'));
+      window.dispatchEvent(new CustomEvent('app:aiSummarize'));
+    },
+    'ai.translate': () => {
+      window.dispatchEvent(new CustomEvent('app:aiToggle'));
+      window.dispatchEvent(new CustomEvent('app:aiTranslate'));
+    },
+    'ai.explainSelection': () => {
+      window.dispatchEvent(new CustomEvent('app:aiExplainSelection'));
     },
   };
   const commands: Command[] = Object.entries(actions).flatMap(([id, run]) =>
