@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import { t } from '../lib/i18n/index.svelte';
-  import { tabs } from '../lib/state/app.svelte';
+  import { bookmarks, navigationHistory, tabs } from '../lib/state/app.svelte';
   import type { TocItem } from '../lib/markdown/types';
   import FileTree from './FileTree.svelte';
   import SearchPanel from './SearchPanel.svelte';
@@ -15,7 +15,7 @@
   let nav = $state<HTMLElement>();
   let scrollTop = $state(0);
   let viewportHeight = $state(0);
-  let activeSection = $state<'contents' | 'files' | 'search'>('contents');
+  let activeSection = $state<'contents' | 'files' | 'search' | 'bookmarks'>('contents');
 
   function showSearch(): void {
     activeSection = 'search';
@@ -110,6 +110,11 @@
       aria-selected={activeSection === 'search'}
       onclick={() => (activeSection = 'search')}>{t('search.title')}</button
     >
+    <button
+      role="tab"
+      aria-selected={activeSection === 'bookmarks'}
+      onclick={() => (activeSection = 'bookmarks')}>{t('sidebar.bookmarks')}</button
+    >
   </div>
   {#if activeSection === 'contents'}
     <h2>{t('sidebar.tableOfContents')}</h2>
@@ -155,8 +160,32 @@
   {:else if activeSection === 'files'}
     <h2>{t('sidebar.files')}</h2>
     <FileTree />
-  {:else}
+  {:else if activeSection === 'search'}
     <h2>{t('search.title')}</h2>
     <SearchPanel />
+  {:else}
+    <h2>{t('sidebar.bookmarks')}</h2>
+    <nav aria-label={t('sidebar.bookmarks')}>
+      {#each bookmarks.items.filter((item) => item.path === tabs.active?.path) as bookmark (`${bookmark.path}:${bookmark.headingId}`)}
+        <button
+          onclick={() => {
+            const active = tabs.active;
+            if (active) {
+              navigationHistory.push({
+                path: active.path,
+                anchor: null,
+                scrollTop: active.scrollTop,
+              });
+              navigationHistory.push({
+                path: bookmark.path,
+                anchor: bookmark.headingId,
+                scrollTop: 0,
+              });
+            }
+            goTo(bookmark.headingId);
+          }}>{bookmark.label}</button
+        >
+      {/each}
+    </nav>
   {/if}
 </aside>

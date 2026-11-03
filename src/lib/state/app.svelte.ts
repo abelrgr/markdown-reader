@@ -16,12 +16,16 @@ import {
 import { normalizeSession } from './session';
 import { settings } from './settings.svelte';
 import { TabsState } from './tabs.svelte';
+import { NavHistory, type Location } from './history';
+import { bookmarksFor, normalizeBookmarks, toggleBookmark, type Bookmark } from './bookmarks';
 import { toasts } from './toasts.svelte';
 
 export const tabs = new TabsState({
   openDocument: (path) => native.openDocument(path),
   render: renderMarkdown,
 });
+export const navigationHistory = new NavHistory();
+export const bookmarks = $state({ items: [] as Bookmark[] });
 export const recents = $state({ items: [] as RecentEntry[] });
 export const workspace = $state({ listing: null as FolderListing | null });
 export const folderSearch = $state({
@@ -99,7 +103,15 @@ export async function openPaths(paths: string[]): Promise<void> {
   for (const path of paths) {
     if (!isMarkdownPath(path)) continue;
     try {
+      const previous = tabs.active;
+      if (previous)
+        navigationHistory.push({
+          path: previous.path,
+          anchor: null,
+          scrollTop: previous.scrollTop,
+        });
       const tab = await tabs.open(path);
+      navigationHistory.push({ path: tab.path, anchor: null, scrollTop: 0 });
       recents.items = addRecent(recents.items, tab.path, Date.now());
       await persistRecents();
     } catch (error: unknown) {
@@ -206,6 +218,7 @@ async function initializeApp(): Promise<void> {
     setLocale(language);
     document.documentElement.lang = language;
     recents.items = normalizeRecents(await native.store.get<unknown>('recents'));
+    bookmarks.items = normalizeBookmarks(await native.store.get<unknown>('bookmarks'));
     if (cancelled) return;
     if (recents.items.length) await removeMissingRecents();
     if (cancelled) return;
@@ -349,11 +362,30 @@ export async function handleViewerClick(event: MouseEvent, tabDir: string): Prom
   event.preventDefault();
   const action = classifyLink(link.getAttribute('href') ?? '', tabDir);
   try {
-    if (action.kind === 'anchor') document.getElementById(action.id)?.scrollIntoView();
+    if (action.kind === 'anchor') {
+      const tab = tabs.active;
+      if (tab) {
+        navigationHistory.push({
+          path: tab.path,
+          anchor: null,
+          scrollTop: currentScrollTop(tab.scrollTop),
+        });
+        navigationHistory.push({ path: tab.path, anchor: action.id, scrollTop: 0 });
+      }
+      document.getElementById(action.id)?.scrollIntoView();
+    }
     if (action.kind === 'external') await native.openExternal(action.url);
     if (action.kind === 'reveal') await native.revealInFolder(action.path);
     if (action.kind === 'document') {
+      const previous = tabs.active;
+      if (previous)
+        navigationHistory.push({
+          path: previous.path,
+          anchor: null,
+          scrollTop: currentScrollTop(previous.scrollTop),
+        });
       const tab = await tabs.open(action.path);
+      navigationHistory.push({ path: tab.path, anchor: action.anchor, scrollTop: 0 });
       if (action.anchor)
         requestAnimationFrame(() => document.getElementById(action.anchor!)?.scrollIntoView());
       recents.items = addRecent(recents.items, tab.path, Date.now());
@@ -362,6 +394,48 @@ export async function handleViewerClick(event: MouseEvent, tabDir: string): Prom
   } catch (error: unknown) {
     notifyError(error);
   }
+}
+
+function currentScrollTop(fallback: number): number {
+  return document.querySelector<HTMLElement>('[data-testid="viewer"]')?.scrollTop ?? fallback;
+}
+
+export async function navigateHistory(location: Location | null): Promise<void> {
+  if (!location) return;
+  try {
+    let tab = tabs.tabs.find((item) => samePath(item.path, location.path));
+    if (!tab) tab = await tabs.open(location.path);
+    else tabs.activate(tab.id);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    if (location.anchor) document.getElementById(location.anchor)?.scrollIntoView();
+    else {
+      const viewer = document.querySelector<HTMLElement>('[data-testid="viewer"]');
+      if (viewer) viewer.scrollTop = location.scrollTop;
+    }
+  } catch (error: unknown) {
+    notifyError(error);
+  }
+}
+
+export function toggleCurrentBookmark(): void {
+  const tab = tabs.active;
+  const viewer = document.querySelector<HTMLElement>('[data-testid="viewer"]');
+  if (!tab || !viewer) return;
+  const headings = [...viewer.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6')];
+  const threshold = viewer.getBoundingClientRect().top + 90;
+  const heading =
+    headings.filter((item) => item.getBoundingClientRect().top <= threshold).at(-1) ?? headings[0];
+  if (!heading) return;
+  bookmarks.items = toggleBookmark(
+    bookmarks.items,
+    { path: tab.path, headingId: heading.id, label: heading.textContent?.trim() ?? heading.id },
+    Date.now(),
+  );
+  void native.store.set('bookmarks', bookmarks.items);
+}
+
+export function bookmarksForActive(): Bookmark[] {
+  return tabs.active ? bookmarksFor(bookmarks.items, tabs.active.path) : [];
 }
 
 export function enhanceViewer(root: HTMLElement, dir: string): void {

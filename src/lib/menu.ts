@@ -74,6 +74,14 @@ export function buildMenuModel(recents: RecentEntry[], opts: { isMac: boolean })
     {
       label: t('menu.view'),
       items: [
+        { kind: 'action', id: 'nav.back', label: t('menu.back'), accelerator: 'Alt+Left' },
+        { kind: 'action', id: 'nav.forward', label: t('menu.forward'), accelerator: 'Alt+Right' },
+        {
+          kind: 'action',
+          id: 'nav.toggleBookmark',
+          label: t('menu.bookmark'),
+          accelerator: 'CmdOrCtrl+D',
+        },
         {
           kind: 'action',
           id: 'view.toggleSidebar',

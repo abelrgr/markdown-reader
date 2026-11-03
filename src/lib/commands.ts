@@ -13,6 +13,9 @@ export type CommandId =
   | 'nav.quickOpen'
   | 'nav.commandPalette'
   | 'nav.searchFolder'
+  | 'nav.back'
+  | 'nav.forward'
+  | 'nav.toggleBookmark'
   | 'file.exportHtml'
   | 'file.print'
   | 'edit.copyAsHtml'
@@ -45,13 +48,15 @@ export async function runCommand(id: CommandId): Promise<void> {
 
 export function matchShortcut(e: KeyboardEvent, shortcut: string, isMac: boolean): boolean {
   const parts = shortcut.split('+');
-  const key = parts.pop();
-  if (!key) return false;
+  const requestedKey = parts.pop();
+  if (!requestedKey) return false;
+  const aliases: Record<string, string> = { left: 'arrowleft', right: 'arrowright' };
+  const key = aliases[requestedKey.toLowerCase()] ?? requestedKey.toLowerCase();
   const modifiers = new Set(parts);
   const wantsCtrl = modifiers.has('Ctrl') || (modifiers.has('Mod') && !isMac);
   const wantsMeta = modifiers.has('Meta') || (modifiers.has('Mod') && isMac);
   return (
-    e.key.toLowerCase() === key.toLowerCase() &&
+    e.key.toLowerCase() === key &&
     e.ctrlKey === wantsCtrl &&
     e.metaKey === wantsMeta &&
     e.shiftKey === modifiers.has('Shift') &&

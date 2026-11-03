@@ -1,7 +1,15 @@
 import { native } from './native';
 import { t } from './i18n/index.svelte';
 import type { MessageKey } from './i18n/en';
-import { openFolderFromDialog, openFromDialog, recents, tabs } from './state/app.svelte';
+import {
+  navigationHistory,
+  navigateHistory,
+  openFolderFromDialog,
+  openFromDialog,
+  recents,
+  tabs,
+  toggleCurrentBookmark,
+} from './state/app.svelte';
 import { settings } from './state/settings.svelte';
 import { registerCommands, type Command, type CommandId } from './commands';
 import { buildStandaloneHtml, collectCss, inlineImages } from './export';
@@ -16,6 +24,9 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'nav.quickOpen': 'menu.quickOpen',
   'nav.commandPalette': 'menu.commandPalette',
   'nav.searchFolder': 'menu.searchFolder',
+  'nav.back': 'menu.back',
+  'nav.forward': 'menu.forward',
+  'nav.toggleBookmark': 'menu.bookmark',
   'file.exportHtml': 'menu.exportHtml',
   'file.print': 'menu.print',
   'edit.copyAsHtml': 'menu.copyAsHtml',
@@ -41,6 +52,9 @@ const shortcuts: Partial<Record<CommandId, string[]>> = {
   'nav.quickOpen': ['Mod+P'],
   'nav.commandPalette': ['Mod+Shift+P'],
   'nav.searchFolder': ['Mod+Shift+F'],
+  'nav.back': ['Alt+Left', 'Mod+['],
+  'nav.forward': ['Alt+Right', 'Mod+]'],
+  'nav.toggleBookmark': ['Mod+D'],
   'file.exportHtml': ['Mod+Shift+E'],
   'file.print': ['Mod+Alt+P'],
   'edit.copyAsHtml': ['Mod+Shift+C'],
@@ -82,6 +96,9 @@ export function registerAppCommands(): void {
     'nav.searchFolder': () => {
       window.dispatchEvent(new CustomEvent('app:searchFolder'));
     },
+    'nav.back': () => navigateHistory(navigationHistory.back()),
+    'nav.forward': () => navigateHistory(navigationHistory.forward()),
+    'nav.toggleBookmark': toggleCurrentBookmark,
     'file.exportHtml': exportHtml,
     'file.print': () => native.printDocument(),
     'edit.copyAsHtml': copyAsHtml,
