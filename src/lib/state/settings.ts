@@ -11,6 +11,7 @@ export interface Settings {
   showSidebar: boolean;
   readingTheme: 'default' | 'github' | 'sepia' | 'contrast';
   customCss: string;
+  autoCheckUpdates: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showSidebar: true,
   readingTheme: 'default',
   customCss: '',
+  autoCheckUpdates: true,
 };
 
 function record(value: unknown): Record<string, unknown> {
@@ -74,5 +76,6 @@ export function normalizeSettings(raw: unknown): Settings {
       'default',
     ),
     customCss: typeof input.customCss === 'string' ? input.customCss.slice(0, 20_000) : '',
+    autoCheckUpdates: typeof input.autoCheckUpdates === 'boolean' ? input.autoCheckUpdates : true,
   };
 }

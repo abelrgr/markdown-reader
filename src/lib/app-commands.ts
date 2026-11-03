@@ -14,6 +14,7 @@ import { settings } from './state/settings.svelte';
 import { registerCommands, type Command, type CommandId } from './commands';
 import { buildStandaloneHtml, collectCss, inlineImages } from './export';
 import { getLocale } from './i18n/index.svelte';
+import { toasts } from './state/toasts.svelte';
 
 const titles: Partial<Record<CommandId, MessageKey>> = {
   'file.open': 'menu.open',
@@ -44,6 +45,7 @@ const titles: Partial<Record<CommandId, MessageKey>> = {
   'tabs.prev': 'tabs.previous',
   'app.settings': 'menu.settings',
   'help.shortcuts': 'menu.shortcuts',
+  'help.checkUpdates': 'menu.checkUpdates',
   'help.about': 'menu.about',
 };
 const shortcuts: Partial<Record<CommandId, string[]>> = {
@@ -124,6 +126,7 @@ export function registerAppCommands(): void {
     'help.shortcuts': () => {
       window.dispatchEvent(new CustomEvent('app:shortcuts'));
     },
+    'help.checkUpdates': checkForUpdates,
     'help.about': () => {
       window.dispatchEvent(new CustomEvent('app:about'));
     },
@@ -137,6 +140,31 @@ export function registerAppCommands(): void {
     })),
   );
   registerCommands(commands);
+}
+
+export async function checkForUpdates(): Promise<void> {
+  try {
+    const update = await native.checkForUpdate();
+    if (!update) {
+      toasts.push('info', t('updates.none'));
+      return;
+    }
+    toasts.pushAction(
+      t('updates.available', { version: update.version }),
+      t('updates.install'),
+      () => {
+        void native
+          .installUpdate(() => undefined)
+          .catch((error: unknown) => {
+            const detail = error instanceof Error ? error.message : String(error);
+            toasts.push('error', t('error.IO', { detail }));
+          });
+      },
+    );
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error);
+    toasts.push('error', t('error.IO', { detail }));
+  }
 }
 
 async function currentHtml(): Promise<string | null> {

@@ -117,6 +117,7 @@ export function buildMenuModel(recents: RecentEntry[], opts: { isMac: boolean })
     {
       label: t('menu.help'),
       items: [
+        { kind: 'action', id: 'help.checkUpdates', label: t('menu.checkUpdates') },
         { kind: 'action', id: 'help.shortcuts', label: t('menu.shortcuts'), accelerator: 'F1' },
         { kind: 'action', id: 'help.about', label: t('menu.about') },
       ],

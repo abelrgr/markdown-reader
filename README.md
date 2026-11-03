@@ -15,6 +15,7 @@ Markdown Reader is a secure, cross-platform desktop app for reading Markdown fil
 - Relative local images, optional blocking of remote images, and automatic file reload while preserving the reading position.
 - Find in document, English and Spanish UI, keyboard shortcuts, native menus, and configurable theme and typography.
 - Windows file association, single-instance handling, and command-line file opening.
+- Signed automatic updates, with an optional periodic update check and a manual check in Help/About.
 
 ## Download
 
@@ -32,6 +33,10 @@ npm run e2e
 ```
 
 Other checks: `npm run check`, `npm run build`, `cargo test --manifest-path src-tauri/Cargo.toml`, and `cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings`.
+
+### Release signing and updates
+
+Updater artifacts are signed with the Tauri updater key. Generate and keep the private key on a trusted release machine (`npx tauri signer generate -w ~/.tauri/markdown-reader.key`); put only its public key in `src-tauri/tauri.conf.json` and store the private key and password as the `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` GitHub Actions secrets. Never commit the private key. Windows code signing and macOS notarization are optional and require paid certificates/accounts; configure `WINDOWS_CERTIFICATE`, `WINDOWS_CERTIFICATE_PASSWORD`, `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`, and `APPLE_TEAM_ID` as repository secrets when available.
 
 ## Project structure
 

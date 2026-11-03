@@ -72,6 +72,8 @@ export interface NativeApi {
   saveFileDialog(defaultName: string, ext: 'html'): Promise<string | null>;
   writeTextFile(path: string, content: string): Promise<void>;
   printDocument(): Promise<void>;
+  checkForUpdate(): Promise<{ version: string; notes: string } | null>;
+  installUpdate(onProgress: (fraction: number) => void): Promise<void>;
   openExternal(url: string): Promise<void>;
   revealInFolder(path: string): Promise<void>;
   toAssetUrl(absPath: string): string;

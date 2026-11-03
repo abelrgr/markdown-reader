@@ -16,6 +16,8 @@
     "opener:allow-open-url",
     "opener:allow-reveal-item-in-dir",
     "window-state:default",
-    "log:default"
+    "log:default",
+    "updater:default",
+    "process:allow-restart"
   ]
 }

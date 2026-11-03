@@ -15,4 +15,8 @@ describe('normalizeSettings', () => {
     expect(normalizeSettings({ customCss: 'x'.repeat(30_000) }).customCss).toHaveLength(20_000);
     expect(normalizeSettings({ readingTheme: 'otro' }).readingTheme).toBe('default');
   });
+  it('enables automatic update checks by default and validates the preference', () => {
+    expect(normalizeSettings(undefined).autoCheckUpdates).toBe(true);
+    expect(normalizeSettings({ autoCheckUpdates: false }).autoCheckUpdates).toBe(false);
+  });
 });

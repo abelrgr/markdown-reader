@@ -33,6 +33,7 @@ export type CommandId =
   | 'tabs.prev'
   | 'app.settings'
   | 'help.shortcuts'
+  | 'help.checkUpdates'
   | 'help.about';
 
 let commands: Command[] = [];

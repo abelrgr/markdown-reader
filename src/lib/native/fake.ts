@@ -42,6 +42,8 @@ type E2eApi = {
   zoom?: number;
   fullscreen?: boolean;
   menu?: MenuModel;
+  update?: { version: string; notes: string } | null;
+  updateInstallCalled?: boolean;
 };
 
 declare global {
@@ -234,6 +236,13 @@ export const fakeNative: NativeApi = {
   },
   async printDocument(): Promise<void> {
     e2e.printRequested = true;
+  },
+  async checkForUpdate(): Promise<{ version: string; notes: string } | null> {
+    return e2e.update ?? null;
+  },
+  async installUpdate(onProgress): Promise<void> {
+    e2e.updateInstallCalled = true;
+    onProgress(1);
   },
   async openExternal(url) {
     e2e.openedUrls.push(url);

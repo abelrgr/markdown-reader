@@ -57,6 +57,15 @@
       "wix": {
         "version": "2.0.0.2"
       }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "untrusted comment: minisign public key: C1E64D9E1D3AEA7D\nRWR96jodnk3mwaGXlfHusxeYk/9zoptHNPot5WOHZPqHcL6F/HdGfg4W\n",
+      "endpoints": [
+        "https://github.com/abelrgr/markdown-reader/releases/latest/download/latest.json"
+      ]
     }
   }
 }

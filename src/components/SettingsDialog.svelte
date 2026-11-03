@@ -152,4 +152,11 @@
       onchange={(event) => settings.update({ showSidebar: event.currentTarget.checked })}
     />{t('settings.showSidebar')}</label
   >
+  <label
+    ><input
+      type="checkbox"
+      checked={settings.value.autoCheckUpdates}
+      onchange={(event) => settings.update({ autoCheckUpdates: event.currentTarget.checked })}
+    />{t('settings.autoCheckUpdates')}</label
+  >
 </Dialog>

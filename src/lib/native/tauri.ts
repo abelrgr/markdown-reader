@@ -7,6 +7,8 @@ import { open, save } from '@tauri-apps/plugin-dialog';
 import { watch } from '@tauri-apps/plugin-fs';
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { load } from '@tauri-apps/plugin-store';
+import { check } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 import { Menu } from '@tauri-apps/api/menu';
 import { dirname, isMarkdownPath, MARKDOWN_EXTENSIONS } from '../fs/paths';
 import { isEventForFile } from './watch-filter';
@@ -20,6 +22,8 @@ import {
   type OpenedDocument,
 } from './types';
 import type { MenuItemModel, MenuModel } from '../menu';
+
+let pendingUpdate: Awaited<ReturnType<typeof check>> | undefined;
 
 function nativeMenuItem(item: MenuItemModel, onAction: (id: string) => void): object {
   if (item.kind === 'separator') return { item: 'Separator' };
@@ -184,6 +188,25 @@ export const tauriNative: NativeApi = {
     } catch (error) {
       throw parseError(error);
     }
+  },
+  async checkForUpdate(): Promise<{ version: string; notes: string } | null> {
+    pendingUpdate = await check();
+    if (!pendingUpdate) return null;
+    return { version: pendingUpdate.version, notes: pendingUpdate.body ?? '' };
+  },
+  async installUpdate(onProgress): Promise<void> {
+    if (!pendingUpdate) throw new Error('No update is ready to install');
+    let total = 0;
+    let received = 0;
+    await pendingUpdate.downloadAndInstall((event) => {
+      if (event.event === 'Started') total = event.data.contentLength ?? 0;
+      if (event.event === 'Progress') {
+        received += event.data.chunkLength;
+        onProgress(total ? Math.min(1, received / total) : 0);
+      }
+    });
+    pendingUpdate = undefined;
+    await relaunch();
   },
   openExternal: openUrl,
   revealInFolder: revealItemInDir,

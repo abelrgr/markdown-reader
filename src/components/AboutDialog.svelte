@@ -3,6 +3,7 @@
   import Dialog from './Dialog.svelte';
   import { t } from '../lib/i18n/index.svelte';
   import { native } from '../lib/native';
+  import { runCommand } from '../lib/commands';
 
   let open = $state(false);
   let version = $state('2.0.0-beta.1');
@@ -35,4 +36,5 @@
     >{t('about.repository')}</a
   >
   <p>{t('about.license')}</p>
+  <button onclick={() => void runCommand('help.checkUpdates')}>{t('menu.checkUpdates')}</button>
 </Dialog>

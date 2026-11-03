@@ -24,7 +24,7 @@
   import { t } from './lib/i18n/index.svelte';
   import { toasts } from './lib/state/toasts.svelte';
   import { bindShortcuts } from './lib/commands';
-  import { registerAppCommands } from './lib/app-commands';
+  import { checkForUpdates, registerAppCommands } from './lib/app-commands';
   import { recents } from './lib/state/app.svelte';
   import SettingsDialog from './components/SettingsDialog.svelte';
   import AboutDialog from './components/AboutDialog.svelte';
@@ -107,6 +107,26 @@
       void native.store.set('session', snapshot);
     }, 500);
     return () => clearTimeout(timer);
+  });
+  $effect(() => {
+    if (!appStatus.ready || !settings.value.autoCheckUpdates) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+    void native.store.get<number>('lastUpdateCheck').then((lastCheck) => {
+      if (
+        cancelled ||
+        (typeof lastCheck === 'number' && Date.now() - lastCheck < 24 * 60 * 60 * 1000)
+      )
+        return;
+      timer = setTimeout(() => {
+        void native.store.set('lastUpdateCheck', Date.now());
+        void checkForUpdates();
+      }, 10_000);
+    });
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   });
 </script>
 
