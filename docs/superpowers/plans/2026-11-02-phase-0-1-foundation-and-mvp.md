@@ -1147,7 +1147,7 @@ Run: `npm run check && npm test && npm run e2e && cargo test --manifest-path src
 Expected: everything PASSES and there is an installer in `src-tauri/target/release/bundle/`. Verified by successful CI run `41700246911` on commit `8255df6`, including signed Windows Tauri bundles; local `npm run check` and `npm run build` also pass at version `2.0.0`.
 
 - [ ] **Step 4: Run the manual QA at least on Windows** and record the results in the phase report. Partial user-confirmed Windows results are recorded in `docs/QA-CHECKLIST.md`; outstanding checks remain unchecked there and must be run before calling this gate complete.
-- [x] **Step 5: Commit and tag (local)** — Phase 1 documentation/version commit and `v2.0.0-beta.1` tag are present locally; the final `2.0.0` release commit/tag are recorded in the Phase 2 plan. No release tag has been pushed.
+- [x] **Step 5: Commit and tag (local)** — Phase 1 documentation/version commit and `v2.0.0-beta.1` baseline tag are present locally; that beta was never published. The first-public-release target is now `1.0.0` (see Phase 2 plan). No release tag has been pushed.
 
 ```bash
 git add -A

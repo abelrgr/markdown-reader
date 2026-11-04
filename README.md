@@ -26,7 +26,7 @@ For a remote provider, choose a preset or configure a compatible endpoint in Set
 
 ## Download
 
-Installers are published on the [GitHub Releases](https://github.com/abelrgr/markdown-reader/releases) page. The current version is `2.0.0`.
+Installers will be published on the [GitHub Releases](https://github.com/abelrgr/markdown-reader/releases) page. The first public release is targeted as `1.0.0`.
 
 ## Development
 

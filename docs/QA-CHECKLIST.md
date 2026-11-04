@@ -19,7 +19,7 @@ Run these checks on each supported desktop OS before publishing a release. Use t
 - [ ] Search for text across a large folder; confirm results, previews, and opening a result at the matching location.
 - [ ] Export to PDF using the system print dialog and export standalone HTML; verify images and page layout.
 - [ ] With AI enabled, summarize a README and ask a question not answered by it; confirm it acknowledges missing information. Prefer local Ollama for the release QA run.
-- [ ] On a `2.0.0-beta.1` installation, check for updates and verify the signed `2.0.0` update can be downloaded and installed.
+- [ ] Verify the signed `1.0.0` installer starts and its updater check reports the expected state. (There is no public predecessor to upgrade from.)
 
 ### Windows findings (2026-11-02)
 
@@ -48,9 +48,10 @@ Run these checks on each supported desktop OS before publishing a release. Use t
 - [ ] Export a document to PDF via the system print dialog.
 - [ ] Verify AI with local Ollama: summarize a README and ask about information absent from it.
 
-## Upgrade QA
+## Release/update QA
 
-- [ ] Upgrade from `2.0.0-beta.1` to `2.0.0` using the signed automatic updater and verify open documents/settings remain usable.
+- The `2.0.0-beta.1` and `2.0.0` tags were never published. `1.0.0` is the first public release target, so a beta-to-release upgrade is not a release gate.
+- [ ] When a subsequent public version is available, upgrade from `1.0.0` using the signed updater and verify open documents/settings remain usable.
 
 ## Automated verification
 
